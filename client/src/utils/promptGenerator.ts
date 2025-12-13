@@ -1,70 +1,78 @@
 
 interface AgentData {
-    name: string;
-    jobDetails: {
-        title: string;
-        description: string;
-    };
-    questions: string[];
-    persona: "formal" | "casual";
-    prompt?: string;
+  name: string;
+  jobDetails: {
+    title: string;
+    description: string;
+  };
+  questions: string[];
+  persona: "formal" | "casual";
+  prompt?: string;
 }
 
 function escapeXml(str: string): string {
-    if (!str) return "";
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
+  if (!str) return "";
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 }
 
 function getPersonaConfig(persona: "formal" | "casual") {
-    if (persona === 'formal') {
-        return {
-            identity: 'Professional HR interviewer conducting a structured screening interview',
-            tone: 'Professional, courteous, and business-like',
-            vocalStyle: 'Clear, measured pace with professional intonation',
-        };
-    }
+  if (persona === 'formal') {
     return {
-        identity: 'Friendly recruiter having a conversational screening chat',
-        tone: 'Warm, approachable, and conversational',
-        vocalStyle: 'Natural, relaxed pace with friendly intonation',
+      identity: 'Professional HR interviewer conducting a structured screening interview',
+      tone: 'Professional, courteous, and business-like',
+      vocalStyle: 'Clear, measured pace with professional intonation',
     };
+  }
+  return {
+    identity: 'Friendly recruiter having a conversational screening chat',
+    tone: 'Warm, approachable, and conversational',
+    vocalStyle: 'Natural, relaxed pace with friendly intonation',
+  };
 }
 
-export function generatePreviewPrompt(agent: AgentData): string {
-    // If agent has a custom XML prompt override, return it directly
-    if (agent.prompt && agent.prompt.trim().startsWith('<?xml')) {
-        return agent.prompt;
+export function generatePreviewPrompt(agent: AgentData, companyContext?: string): string {
+  // If agent has a custom XML prompt override, return it with injected values
+  if (agent.prompt && agent.prompt.trim().startsWith('<?xml')) {
+    let prompt = agent.prompt;
+    if (companyContext) {
+      prompt = prompt.replace('[Company Context]', escapeXml(companyContext));
     }
+    return prompt;
+  }
 
-    const personaConfig = getPersonaConfig(agent.persona);
+  const personaConfig = getPersonaConfig(agent.persona);
 
-    // Mock candidate for preview
-    const candidate = {
-        name: "[Candidate Name]",
-    };
+  // Mock candidate for preview
+  const candidate = {
+    name: "[Candidate Name]",
+  };
 
-    const questionsXml = agent.questions
-        .map((q, i) => `      <question order="${i + 1}">${escapeXml(q)}</question>`)
-        .join('\n');
+  const questionsXml = agent.questions
+    .map((q, i) => `      <question order="${i + 1}">${escapeXml(q)}</question>`)
+    .join('\n');
 
-    // Inject custom instructions if they exist (and aren't XML override)
-    const customInstructions = agent.prompt
-        ? `\n    <custom_instructions>\n      ${escapeXml(agent.prompt)}\n    </custom_instructions>`
-        : '';
+  // Inject custom instructions if they exist (and aren't XML override)
+  const customInstructions = agent.prompt
+    ? `\n    <custom_instructions>\n      ${escapeXml(agent.prompt)}\n    </custom_instructions>`
+    : '';
 
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+  const companyContextXml = companyContext
+    ? `\n  <company_context>\n    ${escapeXml(companyContext)}\n  </company_context>`
+    : '';
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <ai_master_prompt>
   <metadata>
     <agent_name>${escapeXml(agent.name)}</agent_name>
     <job_title>${escapeXml(agent.jobDetails.title)}</job_title>
     <job_description>${escapeXml(agent.jobDetails.description)}</job_description>
     <candidate_name>${escapeXml(candidate.name)}</candidate_name>
-  </metadata>
+  </metadata>${companyContextXml}
 
   <Persona>
     <identity>${escapeXml(personaConfig.identity)}</identity>
@@ -91,5 +99,5 @@ ${questionsXml}
   </interview_flow>
 </ai_master_prompt>`;
 
-    return xml;
+  return xml;
 }

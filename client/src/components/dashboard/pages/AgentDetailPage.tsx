@@ -289,6 +289,7 @@ export function AgentDetailPage() {
           togglePillar={togglePillar}
           allPillars={allPillars}
           pillarLabels={pillarLabels}
+          companyContext={(typeof agent?.companyId === 'object' && agent.companyId !== null && 'context' in agent.companyId) ? (agent.companyId as any).context : undefined}
         />
       )}
 
@@ -337,6 +338,7 @@ interface ConfigTabProps {
   togglePillar: (pillar: string) => void;
   allPillars: string[];
   pillarLabels: Record<string, string>;
+  companyContext?: string;
 }
 
 function ConfigTab({
@@ -344,6 +346,7 @@ function ConfigTab({
   formData,
   setFormData,
   togglePillar,
+  companyContext,
 }: ConfigTabProps) {
   const [showPreview, setShowPreview] = useState(false);
 
@@ -463,6 +466,7 @@ function ConfigTab({
       <PromptPreviewModal
         isOpen={showPreview}
         onClose={() => setShowPreview(false)}
+        companyContext={companyContext}
         agentData={{
           ...formData,
           jobDetails: {
@@ -648,6 +652,28 @@ function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass, onCall
     }
   };
 
+  const handleRetake = async (e: React.MouseEvent, call: Call) => {
+    e.stopPropagation();
+    if (!call.candidateId) return;
+
+    // Extract ID safely handling populate
+    const candidateId = typeof call.candidateId === 'object' && call.candidateId !== null ? (call.candidateId as any)._id : call.candidateId;
+    const agentId = typeof call.agentId === 'object' && call.agentId !== null ? (call.agentId as any)._id : call.agentId;
+
+    if (!candidateId || !agentId) return;
+
+    try {
+      await callApi.create({
+        candidateId,
+        agentId,
+        scheduledTime: new Date().toISOString()
+      });
+      onCallUpdated();
+    } catch (err) {
+      console.error("Failed to retake call", err);
+    }
+  };
+
   const handleViewDetails = (e: React.MouseEvent, call: Call) => {
     e.stopPropagation(); // Prevent card expansion
     setDetailsModalCall(call);
@@ -751,6 +777,16 @@ function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass, onCall
                       >
                         <Eye className="h-3.5 w-3.5" />
                         View Details
+                      </button>
+                    )}
+                    {/* Retake Interview Button */}
+                    {(call.status === "completed" || call.status === "failed") && (
+                      <button
+                        onClick={(e) => handleRetake(e, call)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-700 hover:bg-neutral-600 text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        Retake
                       </button>
                     )}
                     <div className="text-right">

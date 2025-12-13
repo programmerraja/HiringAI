@@ -39,18 +39,20 @@ function getPersonaConfig(persona: 'formal' | 'casual'): {
 /**
  * Builds an XML-structured prompt for Dinodial AI interview
  * 
- * @param agent - The agent configuration
- * @param candidate - The candidate being interviewed
+ * @param companyContext - Context about the company
  * @returns XML string for Dinodial prompt
  * 
  * Requirements: 5.1, 5.2, 5.3, 5.4, 5.5
  */
-export function buildXMLPrompt(agent: IAgent, candidate: ICandidate): string {
+export function buildXMLPrompt(agent: IAgent, candidate: ICandidate, companyContext?: string): string {
   // Check for XML override
   if (agent.prompt && agent.prompt.trim().startsWith('<?xml')) {
-    // Inject candidate name into the override if possible, or just return it
-    // For safety, simple replacement of placeholder if it exists, otherwise return as is
-    return agent.prompt.replace('[Candidate Name]', escapeXml(candidate.name));
+    // Inject candidate name into the override if possible
+    let prompt = agent.prompt.replace('[Candidate Name]', escapeXml(candidate.name));
+    if (companyContext) {
+      prompt = prompt.replace('[Company Context]', escapeXml(companyContext));
+    }
+    return prompt;
   }
 
   const personaConfig = getPersonaConfig(agent.persona);
@@ -64,6 +66,10 @@ export function buildXMLPrompt(agent: IAgent, candidate: ICandidate): string {
     ? `\n    <custom_instructions>\n      ${escapeXml(agent.prompt)}\n    </custom_instructions>`
     : '';
 
+  const companyContextXml = companyContext
+    ? `\n  <company_context>\n    ${escapeXml(companyContext)}\n  </company_context>`
+    : '';
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <ai_master_prompt>
   <metadata>
@@ -71,7 +77,7 @@ export function buildXMLPrompt(agent: IAgent, candidate: ICandidate): string {
     <job_title>${escapeXml(agent.jobDetails.title)}</job_title>
     <job_description>${escapeXml(agent.jobDetails.description)}</job_description>
     <candidate_name>${escapeXml(candidate.name)}</candidate_name>
-  </metadata>
+  </metadata>${companyContextXml}
 
   <Persona>
     <identity>${escapeXml(personaConfig.identity)}</identity>

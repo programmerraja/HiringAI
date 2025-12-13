@@ -15,6 +15,7 @@ interface PromptPreviewModalProps {
         persona: "formal" | "casual";
         prompt?: string;
     };
+    companyContext?: string;
     onSave: (newPrompt: string) => void;
 }
 
@@ -22,6 +23,7 @@ export function PromptPreviewModal({
     isOpen,
     onClose,
     agentData,
+    companyContext,
     onSave,
 }: PromptPreviewModalProps) {
     const [xmlContent, setXmlContent] = useState("");
@@ -34,10 +36,10 @@ export function PromptPreviewModal({
                 // If the current prompt is NOT XML, treat it as custom instructions for generation
                 // If it IS XML, generatePreviewPrompt will return it as-is
                 prompt: agentData.prompt
-            });
+            }, companyContext);
             setXmlContent(generated);
         }
-    }, [isOpen, agentData]);
+    }, [isOpen, agentData, companyContext]);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(xmlContent);

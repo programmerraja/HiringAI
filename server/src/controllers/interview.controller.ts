@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { Call } from '../models/call.model';
 import { Agent } from '../models/agent.model';
 import { Candidate } from '../models/candidate.model';
+import { Company } from '../models/company.model';
 import { AppError } from '../middleware/errorHandler';
 import { dinodialService } from '../services/dinodial.service';
 import { buildXMLPrompt, buildEvaluationTool } from '../utils/promptBuilder';
@@ -75,8 +76,12 @@ export const initiateCall = async (req: Request, res: Response, next: NextFuncti
       return next(error);
     }
 
+    // Fetch company context
+    const company = await Company.findOne({ userId: req.user.id });
+    const companyContext = company?.context;
+
     // Build the XML prompt and evaluation tool
-    const prompt = buildXMLPrompt(agent, candidate);
+    const prompt = buildXMLPrompt(agent, candidate, companyContext);
     const evaluationTool = buildEvaluationTool(agent.pillars);
 
     try {

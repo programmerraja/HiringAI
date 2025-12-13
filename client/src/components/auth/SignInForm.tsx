@@ -68,24 +68,24 @@ export default function SignInForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md border shadow-sm">
+    <div className="flex min-h-screen items-center justify-center bg-black px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md border-neutral-800 bg-neutral-900 shadow-xl">
         <div className="flex justify-center mt-6">
-          <div className="rounded-full bg-blue-100 p-3">
-            <Bot className="h-6 w-6 text-blue-600" />
+          <div className="rounded-full bg-white/10 p-3">
+            <Bot className="h-6 w-6 text-white" />
           </div>
         </div>
         <CardHeader className="space-y-1 pt-2 pb-0">
-          <CardTitle className="text-xl font-semibold text-center">
+          <CardTitle className="text-xl font-semibold text-center text-white">
             Sign in to HiringAI
           </CardTitle>
-          <CardDescription className="text-center text-sm">
+          <CardDescription className="text-center text-sm text-neutral-400">
             Enter your email and password to access your recruiter dashboard
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
           {error && (
-            <Alert variant="destructive" className="mb-4">
+            <Alert variant="destructive" className="mb-4 bg-red-900/50 border-red-900 text-red-200">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -96,12 +96,12 @@ export default function SignInForm() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">Email</FormLabel>
+                    <FormLabel className="text-sm font-medium text-neutral-300">Email</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="you@example.com"
                         {...field}
-                        className="bg-gray-50"
+                        className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-white"
                       />
                     </FormControl>
                     <FormMessage />
@@ -113,7 +113,7 @@ export default function SignInForm() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">
+                    <FormLabel className="text-sm font-medium text-neutral-300">
                       Password
                     </FormLabel>
                     <FormControl>
@@ -121,7 +121,7 @@ export default function SignInForm() {
                         type="password"
                         placeholder="••••••••"
                         {...field}
-                        className="bg-gray-50"
+                        className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-white"
                       />
                     </FormControl>
                     <FormMessage />
@@ -130,7 +130,7 @@ export default function SignInForm() {
               />
               <Button
                 type="submit"
-                className="w-full bg-gray-900 hover:bg-gray-800"
+                className="w-full bg-white text-black hover:bg-neutral-200"
                 disabled={isLoading}
               >
                 {isLoading ? "Signing in..." : "Sign in"}
@@ -141,15 +141,15 @@ export default function SignInForm() {
         <CardFooter className="flex flex-col items-center pb-6 pt-2 space-y-2">
           <Link
             to="/forgot-password"
-            className="text-sm text-blue-600 hover:text-blue-500 font-medium"
+            className="text-sm text-neutral-400 hover:text-white font-medium"
           >
             Forgot Password?
           </Link>
-          <div className="text-sm text-center text-muted-foreground">
+          <div className="text-sm text-center text-neutral-500">
             Don&apos;t have an account?{" "}
             <Link
               to="/signup"
-              className="text-blue-600 hover:text-blue-500 font-medium"
+              className="text-white hover:underline font-medium"
             >
               Sign up
             </Link>
