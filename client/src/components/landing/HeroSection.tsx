@@ -8,7 +8,7 @@ export function HeroSection() {
       {/* Subtle gradient orbs */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
-      
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-8 md:gap-10 lg:gap-12 items-center">
           {/* Content */}
@@ -18,7 +18,7 @@ export function HeroSection() {
               <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Smarter Hiring</span>
             </h1>
             <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto lg:mx-0">
-              Let our conversational voice agent conduct initial candidate interviews 24/7. 
+              Let our conversational voice agent conduct initial candidate interviews 24/7.
               Get detailed assessments, save time, and find the best talent faster.
             </p>
             <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
@@ -49,7 +49,15 @@ export function HeroSection() {
               <div className="bg-neutral-900 rounded-xl sm:rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 border border-neutral-800">
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                   <div className="rounded-full bg-white p-2 sm:p-3">
-                    <Bot className="h-6 w-6 sm:h-8 sm:w-8 text-black" />
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="monogram_grad" x1="8" y1="40" x2="40" y2="8" gradientUnits="userSpaceOnUse">
+                          <stop stop-color="#A855F7" /> <stop offset="1" stop-color="#3B82F6" /> </linearGradient>
+                      </defs>
+                      <path d="M14 10C14 8.89543 14.8954 8 16 8H20C21.1046 8 22 8.89543 22 10V38C22 39.1046 21.1046 40 20 40H16C14.8954 40 14 39.1046 14 38V10Z" fill="url(#monogram_grad)" />
+                      <path d="M26 18C26 16.8954 26.8954 16 28 16H32C33.1046 16 34 16.8954 34 18V38C34 39.1046 33.1046 40 32 40H28C26.8954 40 26 39.1046 26 38V18Z" fill="url(#monogram_grad)" fill-opacity="0.8" />
+                      <path d="M22 22H26" stroke="url(#monogram_grad)" stroke-width="4" stroke-linecap="round" />
+                      <circle cx="38" cy="12" r="4" fill="#EC4899" /> </svg>
                   </div>
                   <div>
                     <p className="font-semibold text-white text-sm sm:text-base">HiringAI Agent</p>

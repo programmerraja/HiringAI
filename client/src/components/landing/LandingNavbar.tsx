@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Bot, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function LandingNavbar() {
@@ -9,6 +9,7 @@ export function LandingNavbar() {
   const navLinks = [
     { label: "Features", href: "#features" },
     { label: "How It Works", href: "#how-it-works" },
+    { label: "Testimonials", href: "#testimonials" },
   ];
 
   return (
@@ -16,11 +17,19 @@ export function LandingNavbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-1.5 sm:gap-2">
-            <div className="rounded-full bg-white p-1.5 sm:p-2">
-              <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-black" />
-            </div>
-            <span className="text-lg sm:text-xl font-bold text-white">HiringAI</span>
+          <Link to="/" className="flex items-center gap-2">
+            <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8">
+              <defs>
+                <linearGradient id="monogram_grad_nav" x1="8" y1="40" x2="40" y2="8" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#A855F7" /> <stop offset="1" stopColor="#3B82F6" />
+                </linearGradient>
+              </defs>
+              <path d="M14 10C14 8.89543 14.8954 8 16 8H20C21.1046 8 22 8.89543 22 10V38C22 39.1046 21.1046 40 20 40H16C14.8954 40 14 39.1046 14 38V10Z" fill="url(#monogram_grad_nav)" />
+              <path d="M26 18C26 16.8954 26.8954 16 28 16H32C33.1046 16 34 16.8954 34 18V38C34 39.1046 33.1046 40 32 40H28C26.8954 40 26 39.1046 26 38V18Z" fill="url(#monogram_grad_nav)" fillOpacity="0.8" />
+              <path d="M22 22H26" stroke="url(#monogram_grad_nav)" strokeWidth="4" strokeLinecap="round" />
+              <circle cx="38" cy="12" r="4" fill="#EC4899" />
+            </svg>
+            <span className="text-lg sm:text-xl font-bold text-white tracking-tight">HiringAI</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -60,9 +69,8 @@ export function LandingNavbar() {
 
       {/* Mobile Menu Drawer */}
       <div
-        className={`md:hidden bg-black border-t border-neutral-800 overflow-hidden transition-all duration-300 ease-in-out ${
-          isMenuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={`md:hidden bg-black border-t border-neutral-800 overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
+          }`}
       >
         <div className="container mx-auto px-4 py-3 sm:py-4 space-y-2 sm:space-y-4">
           {navLinks.map((link) => (

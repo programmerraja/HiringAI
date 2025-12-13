@@ -77,7 +77,7 @@ export const initiateCall = async (req: Request, res: Response, next: NextFuncti
     }
 
     // Fetch company context
-    const company = await Company.findOne({ userId: req.user.id });
+    const company = await Company.findById(agent.companyId);
     const companyContext = company?.context;
 
     // Build the XML prompt and evaluation tool

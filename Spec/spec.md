@@ -14,7 +14,7 @@ The process begins with the recruiter defining the role and context.
 ## 3. Interview Configuration
 The recruiter configures how the specific role should be vetted.
 *   **Assessment Pillars** (User selects one or more):
-    *   **Experience Verification**: Technical depth and work history checks.
+    *   **Experience Verification**: Technical depth and work histo;ry checks.
     *   **Behavioral/Situational**: STAR method questions (e.g., "Tell me about a time...").
     *   **Role-Specific Knowledge**: Tools, frameworks, and domain expertise.
     *   **Cultural Fit**: Alignment with company values and work style.
@@ -27,7 +27,6 @@ The recruiter configures how the specific role should be vetted.
 Focus is on a professional, fair, and two-way interaction.
 *   **Initiation**:
     *   *Option A*: Immediate outbound call (if agreed).
-    *   *Option B*: SMS/Email sent to candidate to "Schedule a Time" (Calls occur at the scheduled slot).
 *   **The Call**:
     1.  **Introduction**: Agent identifies itself as an AI assistant for [Company Name] and requests consent to continue.
     2.  **Screening**: Agent asks the defined questions but allows for natural conversation (follow-ups if answers are vague).
@@ -51,3 +50,30 @@ The system generates a decision-support package for the recruiter.
 *   **Ranking**: Candidates are sorted by their AI Assessment Score for quick prioritization.
 
 
+
+
+TODO
+- Handle resume parsing
+- allow them to customize there brandkit 
+
+
+What is the company about?
+what is ther culuter and vaulues?
+Job description?
+
+
+
+
+Agent 
+
+Name
+Prompt
+company context
+job description
+title 
+Questions 
+Select caditiates 
+
+
+
+Need to add extract candiate info from resume 

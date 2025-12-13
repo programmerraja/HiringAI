@@ -232,7 +232,7 @@ export function SettingsPage() {
             <div className="animate-spin h-8 w-8 border-2 border-white border-t-transparent rounded-full mx-auto"></div>
             <p className="text-neutral-400 mt-2">Loading companies...</p>
           </div>
-        ) : companies.length === 0 ? (
+        ) : companies.length === 0 && !showAddForm ? (
           <div className="text-center py-8">
             <Building2 className="h-10 w-10 text-neutral-600 mx-auto mb-3" />
             <h3 className="text-sm font-medium text-white mb-1">No companies yet</h3>

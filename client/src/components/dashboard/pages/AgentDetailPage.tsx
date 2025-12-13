@@ -9,7 +9,16 @@ import { interviewApi } from "@/services/interview.api";
 import { QuestionGenerator } from "@/components/dashboard/QuestionGenerator";
 import { InterviewDetailsModal } from "@/components/dashboard/InterviewDetailsModal";
 import { PromptPreviewModal } from "@/components/dashboard/PromptPreviewModal";
+import { companyApi } from "@/services/company.api";
 import { UserPlus, UserMinus, Calendar, Clock, Play, Eye, RefreshCw, Volume2, TrendingUp, Target, Copy, Download, Check, Pause } from "lucide-react";
+
+const DEFAULT_SYSTEM_PROMPT_TEMPLATE = `You are an expert interviewer for [Company Name]. Your goal is to assess the candidate's fit for the [Job Title] role.
+Focus on the following key areas:
+1. Technical proficiency in relevant tools and technologies.
+2. Problem-solving skills and approach to challenges.
+3. Cultural alignment with our company values.
+
+Be professional yet approachable. Dig deeper into vague answers with follow-up questions.`;
 
 type TabType = "config" | "candidates" | "calls";
 
@@ -28,6 +37,7 @@ export function AgentDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [companyContext, setCompanyContext] = useState<string | undefined>(undefined);
 
   // Config tab state
   const [formData, setFormData] = useState({
@@ -79,6 +89,18 @@ export function AgentDetailPage() {
         prompt: data.prompt,
         persona: data.persona,
       });
+
+      // Extract company ID from data
+
+      if (data.companyId) {
+        try {
+          const companyData = await companyApi.getById(data.companyId);
+          setCompanyContext(companyData.context);
+        } catch (compErr) {
+          console.error("Failed to fetch company details:", compErr);
+        }
+      }
+
     } catch (err) {
       console.error("Failed to fetch agent:", err);
       setError("Failed to load agent");
@@ -289,7 +311,7 @@ export function AgentDetailPage() {
           togglePillar={togglePillar}
           allPillars={allPillars}
           pillarLabels={pillarLabels}
-          companyContext={(typeof agent?.companyId === 'object' && agent.companyId !== null && 'context' in agent.companyId) ? (agent.companyId as any).context : undefined}
+          companyContext={companyContext}
         />
       )}
 
@@ -438,13 +460,23 @@ function ConfigTab({
       <div className="bg-neutral-900 rounded-lg border border-neutral-800 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">System Prompt</h2>
-          <button
-            onClick={() => setShowPreview(true)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg text-sm transition-colors border border-neutral-700"
-          >
-            <Eye className="h-4 w-4" />
-            Preview & Edit
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setFormData({ ...formData, prompt: DEFAULT_SYSTEM_PROMPT_TEMPLATE })}
+              className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg text-sm transition-colors border border-neutral-700"
+              title="Insert a default prompt template"
+            >
+              <Copy className="h-4 w-4" />
+              Use Template
+            </button>
+            <button
+              onClick={() => setShowPreview(true)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg text-sm transition-colors border border-neutral-700"
+            >
+              <Eye className="h-4 w-4" />
+              Preview & Edit
+            </button>
+          </div>
         </div>
         <p className="text-neutral-400 text-sm mb-3">
           Custom instructions for the AI interviewer. Click Preview to see the full generated XML.

@@ -30,6 +30,8 @@ export function PromptPreviewModal({
     const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
+        console.log("agentData", agentData);
+        console.log("companyContext", companyContext);
         if (isOpen) {
             const generated = generatePreviewPrompt({
                 ...agentData,

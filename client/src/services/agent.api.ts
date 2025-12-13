@@ -8,7 +8,7 @@ export interface JobDetails {
 export interface Agent {
   _id: string;
   userId: string;
-  companyId: string | { _id: string; name: string; website?: string; culture?: string; context?: string };
+  companyId: string;
   name: string;
   jobDetails: JobDetails;
   pillars: string[];

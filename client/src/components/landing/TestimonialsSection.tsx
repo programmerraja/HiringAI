@@ -45,7 +45,7 @@ const stats: Stat[] = [
 
 export function TestimonialsSection() {
   return (
-    <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-black">
+    <section id="testimonials" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Stats Section */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-10 sm:mb-12 md:mb-16">

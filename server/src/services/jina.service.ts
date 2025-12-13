@@ -6,10 +6,10 @@ import { logger } from '../utils/logger';
 
 const JINA_READER_URL = 'https://r.jina.ai';
 
-// Initialize OpenAI with Azure endpoint
-const openai = createOpenAI({
-  baseURL: 'https://models.inference.ai.azure.com',
-  apiKey: process.env.OPENAI_API_KEY || '',
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GOOGLE_API_KEY || '',
 });
 
 export interface JinaScrapedContent {
@@ -63,11 +63,6 @@ export const scrapeWebsite = async (url: string): Promise<JinaScrapedContent> =>
 export const extractCompanyContext = async (
   scrapedContent: string,
 ): Promise<{ context: string }> => {
-  // If no API key, fall back to simple extraction
-  if (!process.env.OPENAI_API_KEY) {
-    logger.warn('OPENAI_API_KEY not set, using simple extraction');
-    return simpleExtraction(scrapedContent);
-  }
 
   try {
     const prompt = `You are an expert HR professional and company analyst. Your task is to extract key information about a company from their website content.
@@ -80,10 +75,11 @@ Please analyze the website content and extract the following information:
 - A brief summary that could be used to answer candidate questions about the company
 
 Website content:
-${scrapedContent.substring(0, 10000)}`;
+${scrapedContent.substring(0, 20000)}`; // Increased token limit for Gemini
 
     const response = await generateObject({
-      model: openai('gpt-4o'),
+      model: google('models/gemini-flash-latest'),
+
       schemaName: 'companyInfo',
       schemaDescription: 'Structured information extracted from a company website',
       schema: z.object({
@@ -105,6 +101,7 @@ ${scrapedContent.substring(0, 10000)}`;
       `**Industry:** ${result.industry}`,
       `**Values:** ${result.values.join(', ')}`,
       `**Products/Services:** ${result.products.join(', ')}`,
+      `**Culture:** ${result.culture}`,
     ];
 
     return {

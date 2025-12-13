@@ -31,7 +31,7 @@ export const getAgent = async (req: Request, res: Response, next: NextFunction) 
     const agent = await Agent.findOne({
       _id: req.params.id,
       userId: req.user.id,
-    }).populate('companyId', 'name website culture context');
+    })
 
     if (!agent) {
       const error: AppError = new Error('Agent not found');
