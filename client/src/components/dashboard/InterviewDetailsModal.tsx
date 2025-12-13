@@ -350,13 +350,19 @@ function OverallRecommendationCard({ recommendation, summary }: OverallRecommend
   const config = recommendationConfig[recommendation] || recommendationConfig.neutral;
 
   return (
-    <div className={`${config.color} ${config.textColor} rounded-xl p-6 text-center shadow-lg animate-fadeIn`}>
-      <p className="text-sm opacity-80 mb-2">HIRING RECOMMENDATION</p>
-      <div className="text-5xl mb-3">{config.icon}</div>
-      <h3 className="text-3xl font-bold mb-2">{config.label}</h3>
-      <p className="text-sm opacity-90 mb-3">{config.description}</p>
+    <div className={`${config.color} ${config.textColor} rounded-xl p-4 text-center shadow-lg animate-fadeIn`}>
+      <p className="text-xs opacity-80 font-medium tracking-wider mb-2">HIRING RECOMMENDATION</p>
+
+      <div className="flex items-center justify-center gap-3 mb-2">
+        <div className="text-4xl">{config.icon}</div>
+        <div className="text-left">
+          <h3 className="text-2xl font-bold leading-none">{config.label}</h3>
+          <p className="text-sm opacity-90 leading-tight mt-1">{config.description}</p>
+        </div>
+      </div>
+
       {summary && (
-        <p className="text-sm italic border-t border-white/20 pt-3 mt-3">
+        <p className="text-sm italic border-t border-white/20 pt-2 mt-2">
           "{summary}"
         </p>
       )}

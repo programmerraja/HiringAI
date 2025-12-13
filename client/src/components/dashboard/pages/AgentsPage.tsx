@@ -69,9 +69,6 @@ export function AgentsPage() {
   };
 
   const getCompanyName = (agent: Agent) => {
-    if (typeof agent.companyId === "object" && agent.companyId?.name) {
-      return agent.companyId.name;
-    }
     const company = companies.find((c) => c._id === agent.companyId);
     return company?.name || "Unknown";
   };
