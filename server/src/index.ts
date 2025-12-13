@@ -54,9 +54,9 @@ app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-app.use("/", express.static("/opt/render/project/src/client/build/"));
+app.use("/", express.static("/opt/render/project/src/client/dist/"));
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve("/opt/render/project/src/client/build/index.html"));
+  res.sendFile(path.resolve("/opt/render/project/src/client/dist/index.html"));
 });
 
 
