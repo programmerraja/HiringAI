@@ -16,7 +16,7 @@ import companyRoutes from './routes/company.routes';
 import agentRoutes from './routes/agent.routes';
 import candidateRoutes from './routes/candidate.routes';
 import callRoutes from './routes/call.routes';
-import path from 'path';  
+import path from 'path';
 dotenv.config();
 
 const app: Express = express();
@@ -54,9 +54,9 @@ app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-app.use("/", express.static(path.join(__dirname, "client/build")));
+app.use("/", express.static(path.join(__dirname, "../client/build")));
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  res.sendFile(path.resolve(__dirname, "../client", "build", "index.html"));
 });
 
 
