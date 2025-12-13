@@ -56,6 +56,9 @@ export function CandidatesPage() {
   };
 
   const getAgentName = (candidate: Candidate) => {
+    if (!candidate.agentId) {
+      return "Unassigned";
+    }
     if (typeof candidate.agentId === "object" && candidate.agentId?.name) {
       return candidate.agentId.name;
     }
@@ -78,15 +81,13 @@ export function CandidatesPage() {
           <h1 className="text-2xl font-bold text-white">Candidates</h1>
           <p className="text-neutral-400 mt-1">View and manage all candidates</p>
         </div>
-        {agents.length > 0 && (
-          <Button
-            className="gap-2 bg-white text-black hover:bg-neutral-200"
-            onClick={() => setShowAddForm(true)}
-          >
-            <Plus className="h-4 w-4" />
-            Add Candidate
-          </Button>
-        )}
+        <Button
+          className="gap-2 bg-white text-black hover:bg-neutral-200"
+          onClick={() => setShowAddForm(true)}
+        >
+          <Plus className="h-4 w-4" />
+          Add Candidate
+        </Button>
       </div>
 
       {/* Filters */}
@@ -132,19 +133,15 @@ export function CandidatesPage() {
             <Users className="h-12 w-12 text-neutral-600 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-white mb-2">No candidates yet</h3>
             <p className="text-neutral-400 mb-4">
-              {agents.length > 0
-                ? "Add candidates to your agents to start the interview process"
-                : "Create an agent first, then add candidates"}
+              Add candidates to start the interview process. You can assign them to agents later.
             </p>
-            {agents.length > 0 && (
-              <Button
-                className="gap-2 bg-white text-black hover:bg-neutral-200"
-                onClick={() => setShowAddForm(true)}
-              >
-                <Plus className="h-4 w-4" />
-                Add Candidate
-              </Button>
-            )}
+            <Button
+              className="gap-2 bg-white text-black hover:bg-neutral-200"
+              onClick={() => setShowAddForm(true)}
+            >
+              <Plus className="h-4 w-4" />
+              Add Candidate
+            </Button>
           </div>
         </div>
       ) : (
@@ -231,7 +228,7 @@ function AddCandidateForm({
   onCreated: (candidate: Candidate) => void;
 }) {
   const [formData, setFormData] = useState({
-    agentId: agents[0]?._id || "",
+    agentId: "",
     name: "",
     email: "",
     phone: "",
@@ -242,15 +239,22 @@ function AddCandidateForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.agentId) {
-      setError("Name, email, and agent are required");
+    if (!formData.name || !formData.email) {
+      setError("Name and email are required");
       return;
     }
 
     try {
       setSubmitting(true);
       setError(null);
-      const candidate = await candidateApi.create(formData);
+      const createData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        resume: formData.resume,
+        ...(formData.agentId && { agentId: formData.agentId }),
+      };
+      const candidate = await candidateApi.create(createData);
       onCreated(candidate);
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to create candidate");
@@ -287,12 +291,13 @@ function AddCandidateForm({
             />
           </div>
           <div>
-            <label className="block text-sm text-neutral-300 mb-1">Agent</label>
+            <label className="block text-sm text-neutral-300 mb-1">Agent (optional)</label>
             <select
               value={formData.agentId}
               onChange={(e) => setFormData({ ...formData, agentId: e.target.value })}
               className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-neutral-600"
             >
+              <option value="">Unassigned</option>
               {agents.map((agent) => (
                 <option key={agent._id} value={agent._id}>
                   {agent.name} - {agent.jobDetails.title}

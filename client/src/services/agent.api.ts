@@ -39,6 +39,17 @@ export interface UpdateAgentData {
   persona?: "formal" | "casual";
 }
 
+export type Pillar = "experience" | "behavioral" | "role_specific" | "cultural_fit";
+
+export interface GenerateQuestionsRequest {
+  pillar: Pillar;
+  prompt: string;
+}
+
+export interface GenerateQuestionsResponse {
+  questions: string[];
+}
+
 export const agentApi = {
   getAll: async (): Promise<Agent[]> => {
     const response = await api.get("/agents");
@@ -67,5 +78,13 @@ export const agentApi = {
 
   delete: async (id: string): Promise<void> => {
     await api.delete(`/agents/${id}`);
+  },
+
+  generateQuestions: async (
+    id: string,
+    data: GenerateQuestionsRequest
+  ): Promise<GenerateQuestionsResponse> => {
+    const response = await api.post(`/agents/${id}/generate-questions`, data);
+    return response.data.data;
   },
 };

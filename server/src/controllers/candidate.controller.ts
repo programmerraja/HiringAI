@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Candidate } from '../models/candidate.model';
 import { Agent } from '../models/agent.model';
+import { Call } from '../models/call.model';
 import { AppError } from '../middleware/errorHandler';
 
 // @desc    Get all candidates (optionally filter by agentId)
@@ -14,8 +15,13 @@ export const getCandidates = async (req: Request, res: Response, next: NextFunct
     const userAgents = await Agent.find({ userId: req.user.id }).select('_id');
     const agentIds = userAgents.map((a) => a._id);
 
-    // Build query
-    const query: any = { agentId: { $in: agentIds } };
+    // Build query - include candidates assigned to user's agents OR unassigned candidates
+    const query: any = {
+      $or: [
+        { agentId: { $in: agentIds } },
+        { agentId: null }
+      ]
+    };
 
     if (agentId) {
       // Verify agent belongs to user
@@ -24,6 +30,7 @@ export const getCandidates = async (req: Request, res: Response, next: NextFunct
         error.statusCode = 404;
         return next(error);
       }
+      query.$or = undefined;
       query.agentId = agentId;
     }
 
@@ -61,16 +68,18 @@ export const getCandidate = async (req: Request, res: Response, next: NextFuncti
       return next(error);
     }
 
-    // Verify candidate's agent belongs to user
-    const agent = await Agent.findOne({
-      _id: candidate.agentId,
-      userId: req.user.id,
-    });
+    // If candidate has an agent, verify it belongs to user
+    if (candidate.agentId) {
+      const agent = await Agent.findOne({
+        _id: candidate.agentId,
+        userId: req.user.id,
+      });
 
-    if (!agent) {
-      const error: AppError = new Error('Candidate not found');
-      error.statusCode = 404;
-      return next(error);
+      if (!agent) {
+        const error: AppError = new Error('Candidate not found');
+        error.statusCode = 404;
+        return next(error);
+      }
     }
 
     res.status(200).json({
@@ -89,25 +98,26 @@ export const createCandidate = async (req: Request, res: Response, next: NextFun
   try {
     const { agentId, name, email, phone, resume } = req.body;
 
-    // Verify agent belongs to user
-    const agent = await Agent.findOne({
-      _id: agentId,
-      userId: req.user.id,
-    });
+    // If agentId is provided, verify agent belongs to user
+    if (agentId) {
+      const agent = await Agent.findOne({
+        _id: agentId,
+        userId: req.user.id,
+      });
 
-    if (!agent) {
-      const error: AppError = new Error('Agent not found');
-      error.statusCode = 404;
-      return next(error);
+      if (!agent) {
+        const error: AppError = new Error('Agent not found');
+        error.statusCode = 404;
+        return next(error);
+      }
     }
 
     const candidate = await Candidate.create({
-      agentId,
+      agentId: agentId || null,
       name,
       email,
       phone: phone || '',
       resume: resume || '',
-      status: 'pending',
     });
 
     res.status(201).json({
@@ -124,7 +134,7 @@ export const createCandidate = async (req: Request, res: Response, next: NextFun
 // @access  Private
 export const updateCandidate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, email, phone, resume, recordingUrl, feedback } = req.body;
+    const { name, email, phone, resume } = req.body;
 
     const candidate = await Candidate.findById(req.params.id);
 
@@ -134,24 +144,24 @@ export const updateCandidate = async (req: Request, res: Response, next: NextFun
       return next(error);
     }
 
-    // Verify candidate's agent belongs to user
-    const agent = await Agent.findOne({
-      _id: candidate.agentId,
-      userId: req.user.id,
-    });
+    // If candidate has an agent, verify it belongs to user
+    if (candidate.agentId) {
+      const agent = await Agent.findOne({
+        _id: candidate.agentId,
+        userId: req.user.id,
+      });
 
-    if (!agent) {
-      const error: AppError = new Error('Candidate not found');
-      error.statusCode = 404;
-      return next(error);
+      if (!agent) {
+        const error: AppError = new Error('Candidate not found');
+        error.statusCode = 404;
+        return next(error);
+      }
     }
 
     candidate.name = name || candidate.name;
     candidate.email = email || candidate.email;
     if (phone !== undefined) candidate.phone = phone;
     if (resume !== undefined) candidate.resume = resume;
-    if (recordingUrl !== undefined) candidate.recordingUrl = recordingUrl;
-    if (feedback !== undefined) candidate.feedback = feedback;
 
     await candidate.save();
 
@@ -185,19 +195,20 @@ export const updateCandidateStatus = async (req: Request, res: Response, next: N
       return next(error);
     }
 
-    // Verify candidate's agent belongs to user
-    const agent = await Agent.findOne({
-      _id: candidate.agentId,
-      userId: req.user.id,
-    });
+    // If candidate has an agent, verify it belongs to user
+    if (candidate.agentId) {
+      const agent = await Agent.findOne({
+        _id: candidate.agentId,
+        userId: req.user.id,
+      });
 
-    if (!agent) {
-      const error: AppError = new Error('Candidate not found');
-      error.statusCode = 404;
-      return next(error);
+      if (!agent) {
+        const error: AppError = new Error('Candidate not found');
+        error.statusCode = 404;
+        return next(error);
+      }
     }
 
-    candidate.status = status;
     await candidate.save();
 
     res.status(200).json({
@@ -222,16 +233,18 @@ export const deleteCandidate = async (req: Request, res: Response, next: NextFun
       return next(error);
     }
 
-    // Verify candidate's agent belongs to user
-    const agent = await Agent.findOne({
-      _id: candidate.agentId,
-      userId: req.user.id,
-    });
+    // If candidate has an agent, verify it belongs to user
+    if (candidate.agentId) {
+      const agent = await Agent.findOne({
+        _id: candidate.agentId,
+        userId: req.user.id,
+      });
 
-    if (!agent) {
-      const error: AppError = new Error('Candidate not found');
-      error.statusCode = 404;
-      return next(error);
+      if (!agent) {
+        const error: AppError = new Error('Candidate not found');
+        error.statusCode = 404;
+        return next(error);
+      }
     }
 
     await candidate.deleteOne();
@@ -239,6 +252,134 @@ export const deleteCandidate = async (req: Request, res: Response, next: NextFun
     res.status(200).json({
       success: true,
       data: {},
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Assign candidate to agent
+// @route   POST /api/candidates/:id/assign
+// @access  Private
+export const assignCandidateToAgent = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { agentId, scheduledTime } = req.body;
+
+    if (!agentId) {
+      const error: AppError = new Error('Missing required field: agentId');
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    if (!scheduledTime) {
+      const error: AppError = new Error('Missing required field: scheduledTime');
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    // Verify agent exists and belongs to user
+    const agent = await Agent.findOne({
+      _id: agentId,
+      userId: req.user.id,
+    });
+
+    if (!agent) {
+      const error: AppError = new Error('Agent not found');
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    const candidate = await Candidate.findById(req.params.id);
+
+    if (!candidate) {
+      const error: AppError = new Error('Candidate not found');
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    // Check if candidate is already assigned to another agent
+    if (candidate.agentId && candidate.agentId.toString() !== agentId) {
+      const error: AppError = new Error('Candidate is already assigned to an agent');
+      error.statusCode = 409;
+      return next(error);
+    }
+
+    // Update candidate's agentId
+    candidate.agentId = agentId;
+    await candidate.save();
+
+    // Auto-create Call record with status "scheduled"
+    const call = await Call.create({
+      candidateId: candidate._id,
+      agentId: agentId,
+      status: 'scheduled',
+      scheduledTime: new Date(scheduledTime),
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        candidate,
+        call,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Remove candidate from agent
+// @route   POST /api/candidates/:id/remove
+// @access  Private
+export const removeCandidateFromAgent = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const candidate = await Candidate.findById(req.params.id);
+
+    if (!candidate) {
+      const error: AppError = new Error('Candidate not found');
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    // If candidate has an agent, verify it belongs to user
+    if (candidate.agentId) {
+      const agent = await Agent.findOne({
+        _id: candidate.agentId,
+        userId: req.user.id,
+      });
+
+      if (!agent) {
+        const error: AppError = new Error('Candidate not found');
+        error.statusCode = 404;
+        return next(error);
+      }
+    }
+
+    // Clear candidate's agentId
+    candidate.agentId = null;
+    await candidate.save();
+
+    res.status(200).json({
+      success: true,
+      data: candidate,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get unassigned candidates
+// @route   GET /api/candidates/unassigned
+// @access  Private
+export const getUnassignedCandidates = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const candidates = await Candidate.find({ agentId: null })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: candidates.length,
+      data: candidates,
     });
   } catch (error) {
     next(error);

@@ -2,7 +2,7 @@ import api from "./api";
 
 export interface Candidate {
   _id: string;
-  agentId: string | { _id: string; name: string; jobDetails?: { title: string } };
+  agentId: string | { _id: string; name: string; jobDetails?: { title: string } } | null;
   name: string;
   email: string;
   phone: string;
@@ -12,7 +12,7 @@ export interface Candidate {
 }
 
 export interface CreateCandidateData {
-  agentId: string;
+  agentId?: string;
   name: string;
   email: string;
   phone?: string;
@@ -51,5 +51,27 @@ export const candidateApi = {
 
   delete: async (id: string): Promise<void> => {
     await api.delete(`/candidates/${id}`);
+  },
+
+  getUnassigned: async (): Promise<Candidate[]> => {
+    const response = await api.get("/candidates/unassigned");
+    return response.data.data;
+  },
+
+  assignToAgent: async (
+    candidateId: string,
+    agentId: string,
+    scheduledTime: string
+  ): Promise<{ candidate: Candidate; call: any }> => {
+    const response = await api.post(`/candidates/${candidateId}/assign`, {
+      agentId,
+      scheduledTime,
+    });
+    return response.data.data;
+  },
+
+  removeFromAgent: async (candidateId: string): Promise<Candidate> => {
+    const response = await api.post(`/candidates/${candidateId}/remove`);
+    return response.data.data;
   },
 };

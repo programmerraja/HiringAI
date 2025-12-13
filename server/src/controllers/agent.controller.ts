@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Agent } from '../models/agent.model';
 import { Company } from '../models/company.model';
 import { AppError } from '../middleware/errorHandler';
+import { generateQuestions, Pillar } from '../services/question.service';
 
 // @desc    Get all agents for current user
 // @route   GET /api/agents
@@ -185,6 +186,59 @@ export const deleteAgent = async (req: Request, res: Response, next: NextFunctio
     res.status(200).json({
       success: true,
       data: {},
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Generate questions for agent using AI
+// @route   POST /api/agents/:id/generate-questions
+// @access  Private
+export const generateAgentQuestions = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { pillar, prompt } = req.body;
+
+    // Validate pillar
+    const validPillars: Pillar[] = ['experience', 'behavioral', 'role_specific', 'cultural_fit'];
+    if (!pillar || !validPillars.includes(pillar)) {
+      const error: AppError = new Error(
+        'Invalid pillar. Must be one of: experience, behavioral, role_specific, cultural_fit'
+      );
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    // Validate prompt
+    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+      const error: AppError = new Error('Prompt is required');
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    // Get agent to retrieve job details
+    const agent = await Agent.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+
+    if (!agent) {
+      const error: AppError = new Error('Agent not found');
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    // Generate questions using AI service
+    const result = await generateQuestions({
+      pillar,
+      prompt: prompt.trim(),
+      jobTitle: agent.jobDetails.title,
+      jobDescription: agent.jobDetails.description,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: result,
     });
   } catch (error) {
     next(error);

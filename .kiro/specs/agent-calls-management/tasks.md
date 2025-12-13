@@ -1,0 +1,150 @@
+# Implementation Plan
+
+- [x] 1. Create Call Model and Database Schema
+  - [x] 1.1 Create Call model with candidateId, agentId, status, scheduledTime, recordingUrl fields
+    - Create `server/src/models/call.model.ts`
+    - Define ICall interface with all required fields
+    - Implement mongoose schema with validation
+    - Add indexes for candidateId and agentId
+    - _Requirements: 1.2_
+  - [ ] 1.2 Write property test for Call model field integrity
+    - **Property 2: Call Record Field Integrity**
+    - **Validates: Requirements 1.2**
+  - [ ]* 1.3 Write property test for Call status validation
+    - **Property 3: Call Status Transition Validity**
+    - **Validates: Requirements 1.3**
+
+- [x] 2. Update Candidate Model for Independent Creation
+  - [x] 2.1 Modify Candidate model to make agentId optional
+    - Update `server/src/models/candidate.model.ts`
+    - Change agentId from required to optional (allow null)
+    - _Requirements: 6.1_
+  - [ ]* 2.2 Write property test for independent candidate creation
+    - **Property 12: Independent Candidate Creation**
+    - **Validates: Requirements 6.1**
+
+- [x] 3. Implement Call Controller and Routes
+  - [x] 3.1 Create Call controller with CRUD operations
+    - Create `server/src/controllers/call.controller.ts`
+    - Implement createCall, getCallsByAgent, getCallsByCandidate, updateCall, updateCallStatus
+    - _Requirements: 1.1, 1.3, 1.4_
+  - [x] 3.2 Create Call routes
+    - Create `server/src/routes/call.routes.ts`
+    - Define POST /api/calls, GET /api/calls/agent/:agentId, GET /api/calls/candidate/:candidateId, PATCH /api/calls/:id, PATCH /api/calls/:id/status
+    - Register routes in main app
+    - _Requirements: 1.1, 1.3, 1.4_
+  - [ ]* 3.3 Write property test for agent calls query completeness
+    - **Property 4: Agent Calls Query Completeness**
+    - **Validates: Requirements 1.4**
+
+- [x] 4. Implement Candidate Assignment Logic
+  - [x] 4.1 Create candidate assignment endpoint
+    - Add assignCandidateToAgent function in candidate controller
+    - Update candidate's agentId when assigned
+    - Auto-create Call record with status "scheduled"
+    - Validate candidate is not already assigned to another agent
+    - _Requirements: 1.1, 4.1, 4.2, 4.3_
+  - [x] 4.2 Create candidate removal endpoint
+    - Add removeCandidateFromAgent function
+    - Clear candidate's agentId on removal
+    - _Requirements: 4.4_
+  - [x] 4.3 Create unassigned candidates endpoint
+    - Add getUnassignedCandidates function
+    - Return candidates where agentId is null
+    - _Requirements: 6.2_
+  - [ ]* 4.4 Write property test for candidate assignment creates call
+    - **Property 1: Candidate Assignment Creates Call Record**
+    - **Validates: Requirements 1.1, 4.2**
+  - [ ]* 4.5 Write property test for single agent assignment constraint
+    - **Property 9: Single Agent Assignment Constraint**
+    - **Validates: Requirements 4.3**
+  - [ ]* 4.6 Write property test for candidate removal clears agentId
+    - **Property 10: Candidate Removal Clears AgentId**
+    - **Validates: Requirements 4.4**
+  - [ ]* 4.7 Write property test for unassigned candidates filter
+    - **Property 13: Unassigned Candidates Filter**
+    - **Validates: Requirements 6.2**
+
+- [ ] 5. Checkpoint - Ensure all backend tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 6. Implement AI Question Generation Service
+  - [x] 6.1 Create question generation service
+    - Create `server/src/services/question.service.ts`
+    - Implement generateQuestions function using existing AI SDK
+    - Accept pillar, prompt, and job details as parameters
+    - Return array of generated questions
+    - _Requirements: 2.1_
+  - [x] 6.2 Create question generation endpoint
+    - Add route POST /api/agents/:id/generate-questions
+    - Accept pillar and custom prompt in request body
+    - _Requirements: 2.1, 3.3, 3.4_
+  - [ ]* 6.3 Write property test for custom prompt passthrough
+    - **Property 7: Custom Prompt Passthrough**
+    - **Validates: Requirements 3.3, 3.4**
+
+- [x] 7. Implement Frontend Pillar Prompts
+  - [x] 7.1 Create pillar prompts constants file
+    - Create `client/src/constants/pillarPrompts.ts`
+    - Define hardcoded prompts for experience, behavioral, role_specific, cultural_fit
+    - _Requirements: 3.1, 3.2_
+  - [ ]* 7.2 Write property test for pillar prompt selection
+    - **Property 6: Pillar Prompt Selection Correctness**
+    - **Validates: Requirements 3.2**
+
+- [x] 8. Implement Agent Detail Page with Tabs
+  - [x] 8.1 Refactor AgentDetailPage with tab structure
+    - Update `client/src/components/dashboard/pages/AgentDetailPage.tsx`
+    - Add tab navigation for Config, Candidates, Calls
+    - Implement tab state management
+    - _Requirements: 5.1_
+  - [x] 8.2 Implement Config Tab content
+    - Display agent name, job details, pillars, questions, prompt, persona
+    - Integrate question management UI
+    - _Requirements: 5.2_
+  - [x] 8.3 Implement Candidates Tab content
+    - Display list of assigned candidates
+    - Add candidate assignment interface with unassigned candidates dropdown
+    - Add scheduled time picker for assignment
+    - Add remove candidate functionality
+    - _Requirements: 5.3, 6.3_
+  - [ ]* 8.4 Write property test for candidates tab shows assigned candidates
+    - **Property 11: Candidates Tab Shows Assigned Candidates**
+    - **Validates: Requirements 5.3**
+  - [x] 8.5 Implement Calls Tab content
+    - Display list of calls with candidate name, status, scheduled time
+    - Add click handler to view call details
+    - _Requirements: 5.4, 5.5_
+
+- [x] 9. Implement Question Generator Component
+  - [x] 9.1 Create QuestionGenerator component
+    - Create `client/src/components/dashboard/QuestionGenerator.tsx`
+    - Add pillar selector dropdown
+    - Display editable prompt textarea with default pillar prompt
+    - Add "Generate with AI" button
+    - _Requirements: 2.1, 3.1, 3.2, 3.3_
+  - [x] 9.2 Implement question list management
+    - Display generated questions list
+    - Add edit functionality for each question
+    - Add delete functionality for each question
+    - Add manual question input field
+    - _Requirements: 2.2, 2.3, 2.4, 2.5_
+  - [ ]* 9.3 Write property test for question list manipulation
+    - **Property 5: Question List Manipulation Consistency**
+    - **Validates: Requirements 2.3, 2.4, 2.5**
+
+- [x] 10. Create Frontend API Services
+  - [x] 10.1 Create Call API service
+    - Create `client/src/services/call.api.ts`
+    - Implement createCall, getCallsByAgent, updateCall, updateCallStatus functions
+    - _Requirements: 1.1, 1.3, 1.4_
+  - [x] 10.2 Update Candidate API service
+    - Update `client/src/services/candidate.api.ts`
+    - Add assignToAgent, removeFromAgent, getUnassigned functions
+    - _Requirements: 4.1, 4.4, 6.2_
+  - [x] 10.3 Create Question Generation API service
+    - Add generateQuestions function to agent API
+    - _Requirements: 2.1_
+
+- [ ] 11. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

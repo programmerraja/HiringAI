@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ICandidate extends Document {
-  agentId: mongoose.Types.ObjectId;
+  agentId: mongoose.Types.ObjectId | null;
   name: string;
   email: string;
   phone: string;
@@ -15,7 +15,8 @@ const candidateSchema = new Schema<ICandidate>(
     agentId: {
       type: Schema.Types.ObjectId,
       ref: 'Agent',
-      required: [true, 'Agent ID is required'],
+      required: false,
+      default: null,
     },
     name: {
       type: String,

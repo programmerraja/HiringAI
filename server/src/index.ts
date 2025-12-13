@@ -15,6 +15,7 @@ import userRoutes from './routes/user.routes';
 import companyRoutes from './routes/company.routes';
 import agentRoutes from './routes/agent.routes';
 import candidateRoutes from './routes/candidate.routes';
+import callRoutes from './routes/call.routes';
 
 dotenv.config();
 
@@ -47,6 +48,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/agents', agentRoutes);
 app.use('/api/candidates', candidateRoutes);
+app.use('/api/calls', callRoutes);
 
 app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
