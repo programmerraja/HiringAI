@@ -10,23 +10,23 @@ interface Step {
 const steps: Step[] = [
   {
     number: 1,
-    title: "Set Up Your Job",
+    title: "Input Job Details",
     description:
-      "Provide your company website and job description. Our AI extracts context automatically to create tailored interview questions.",
+      "Enter the job title, description, and key requirements. Our AI instantly creates a tailored interview persona and questions.",
     icon: <Briefcase className="h-5 w-5 sm:h-6 sm:w-6 text-black" />,
   },
   {
     number: 2,
     title: "AI Conducts Interviews",
     description:
-      "Candidates receive calls from our voice agent for natural, conversational screening available 24/7 in multiple languages.",
+      "Candidates receive calls from our voice agent for natural, conversational screening available 24/7.",
     icon: <Phone className="h-5 w-5 sm:h-6 sm:w-6 text-black" />,
   },
   {
     number: 3,
     title: "Review Assessments",
     description:
-      "Get detailed scorecards, full transcripts, and AI-powered recommendations for each candidate to make informed decisions.",
+      "Get detailed scorecards, audio recordings, and AI-powered recommendations for each candidate to make informed decisions.",
     icon: <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-black" />,
   },
 ];
@@ -51,12 +51,12 @@ export function HowItWorksSection() {
               {index < steps.length - 1 && (
                 <div className="hidden md:block absolute top-8 lg:top-10 left-[60%] w-full h-0.5 bg-neutral-800" />
               )}
-              
+
               {/* Vertical connector for mobile */}
               {index < steps.length - 1 && (
                 <div className="md:hidden absolute left-1/2 top-[4.5rem] h-8 w-0.5 bg-neutral-800 -translate-x-1/2" />
               )}
-              
+
               <div className="flex flex-col items-center text-center pb-4 md:pb-0">
                 <div className="relative z-10 rounded-full bg-white w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 flex items-center justify-center mb-4 sm:mb-5 md:mb-6 shadow-lg">
                   {step.icon}
@@ -85,21 +85,21 @@ export function HowItWorksSection() {
               <div className="text-2xl sm:text-3xl mb-1.5 sm:mb-2">📊</div>
               <h4 className="font-medium text-white text-sm sm:text-base">Scorecard</h4>
               <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-                Detailed ratings across all assessment pillars
+                Visual ratings across key assessment pillars
               </p>
             </div>
             <div className="text-center p-3 sm:p-4">
               <div className="text-2xl sm:text-3xl mb-1.5 sm:mb-2">📝</div>
-              <h4 className="font-medium text-white text-sm sm:text-base">Summary</h4>
+              <h4 className="font-medium text-white text-sm sm:text-base">Analysis</h4>
               <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-                AI-generated overview of candidate strengths
+                AI-driven insights on strengths & weaknesses
               </p>
             </div>
             <div className="text-center p-3 sm:p-4">
-              <div className="text-2xl sm:text-3xl mb-1.5 sm:mb-2">💬</div>
-              <h4 className="font-medium text-white text-sm sm:text-base">Transcript</h4>
+              <div className="text-2xl sm:text-3xl mb-1.5 sm:mb-2">🎧</div>
+              <h4 className="font-medium text-white text-sm sm:text-base">Recording</h4>
               <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-                Full conversation record for review
+                Full audio playback of the interview
               </p>
             </div>
           </div>

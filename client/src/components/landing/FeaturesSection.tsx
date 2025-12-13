@@ -1,4 +1,4 @@
-import { CheckCircle, MessageSquare, Brain, Users } from "lucide-react";
+import { CheckCircle, Sparkles, Sliders, BarChart3 } from "lucide-react";
 
 interface Feature {
   icon: React.ReactNode;
@@ -8,28 +8,28 @@ interface Feature {
 
 const features: Feature[] = [
   {
+    icon: <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-white" />,
+    title: "Smart Question Studio",
+    description:
+      "AI automatically generates role-specific interview questions based on difficulty, category, and estimated duration.",
+  },
+  {
+    icon: <Sliders className="h-6 w-6 sm:h-8 sm:w-8 text-white" />,
+    title: "Advanced Prompt Control",
+    description:
+      "Full transparency and control over the AI persona. Preview and edit the exact system prompt and XML instructions.",
+  },
+  {
     icon: <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-white" />,
-    title: "Experience Verification",
+    title: "Real-time Voice Intelligence",
     description:
-      "AI validates technical depth and work history with intelligent follow-up questions that dig deeper into candidate expertise.",
+      "Our Ultra-Fast AI (Dinodial) conducts natural, low-latency voice conversations that feel just like a human recruiter.",
   },
   {
-    icon: <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-white" />,
-    title: "Behavioral Assessment",
+    icon: <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-white" />,
+    title: "Insightful Scorecards",
     description:
-      "STAR method questions evaluate problem-solving abilities and situational responses to real-world scenarios.",
-  },
-  {
-    icon: <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-white" />,
-    title: "Role-Specific Knowledge",
-    description:
-      "Custom questions assess tools, frameworks, and domain expertise tailored to your specific job requirements.",
-  },
-  {
-    icon: <Users className="h-6 w-6 sm:h-8 sm:w-8 text-white" />,
-    title: "Cultural Fit Analysis",
-    description:
-      "Evaluate alignment with company values, work style preferences, and team dynamics for better hiring decisions.",
+      "Visual performance breakdowns with clear strengths, weaknesses, and hiring recommendations for every candidate.",
   },
 ];
 
@@ -42,7 +42,7 @@ export function FeaturesSection() {
             Four Pillars of Assessment
           </h2>
           <p className="mt-3 sm:mt-4 text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto px-4 sm:px-0">
-            Our AI conducts comprehensive interviews covering all critical dimensions 
+            Our AI conducts comprehensive interviews covering all critical dimensions
             of candidate evaluation.
           </p>
         </div>
