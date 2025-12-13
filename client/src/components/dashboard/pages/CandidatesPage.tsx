@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Users, Plus, Mail, Phone, FileText, Trash2, Eye, X } from "lucide-react";
+import { Users, Plus, Mail, Phone, Trash2, Eye, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { candidateApi, Candidate } from "@/services/candidate.api";
+import { candidateApi, Candidate, ParsedResume } from "@/services/candidate.api";
 import { agentApi, Agent } from "@/services/agent.api";
+import { ResumeUploader } from "@/components/dashboard/ResumeUploader";
 
 export function CandidatesPage() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -232,11 +233,27 @@ function AddCandidateForm({
     name: "",
     email: "",
     phone: "",
-    resume: "",
     scheduledTime: "",
   });
+  const [parsedResume, setParsedResume] = useState<ParsedResume | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleResumeParsed = (resume: ParsedResume) => {
+    setParsedResume(resume);
+    // Auto-populate form fields from parsed resume
+    setFormData((prev) => ({
+      ...prev,
+      name: resume.name || prev.name,
+      email: resume.email || prev.email,
+      phone: resume.phone || prev.phone,
+    }));
+    setError(null);
+  };
+
+  const handleResumeError = (errorMsg: string) => {
+    setError(errorMsg);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -257,7 +274,7 @@ function AddCandidateForm({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        resume: formData.resume,
+        resume: parsedResume,
         ...(formData.agentId && { agentId: formData.agentId, scheduledTime: formData.scheduledTime }),
       };
       const candidate = await candidateApi.create(createData);
@@ -285,6 +302,12 @@ function AddCandidateForm({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Resume Uploader - First so it can auto-populate fields */}
+        <ResumeUploader
+          onParsed={handleResumeParsed}
+          onError={handleResumeError}
+        />
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-neutral-300 mb-1">Name</label>
@@ -348,20 +371,6 @@ function AddCandidateForm({
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm text-neutral-300 mb-1">
-            <FileText className="h-4 w-4 inline mr-1" />
-            Resume (paste text)
-          </label>
-          <textarea
-            value={formData.resume}
-            onChange={(e) => setFormData({ ...formData, resume: e.target.value })}
-            placeholder="Paste resume content here..."
-            rows={4}
-            className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-600 resize-none"
-          />
-        </div>
-
         <div className="flex gap-3">
           <Button
             type="submit"
@@ -394,6 +403,13 @@ function CandidateDetailModal({
   agentName: string;
   onClose: () => void;
 }) {
+  const resume = candidate.resume;
+  const hasResumeData = resume && (
+    resume.skills.length > 0 ||
+    resume.experience.length > 0 ||
+    resume.education.length > 0
+  );
+
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
       <div className="bg-neutral-900 rounded-lg border border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -425,16 +441,109 @@ function CandidateDetailModal({
             </div>
           </div>
 
-          {/* Resume */}
-          {candidate.resume && (
-            <div>
-              <label className="text-sm text-neutral-400 mb-2 block">Resume</label>
-              <div className="bg-neutral-800 rounded-lg p-4 max-h-48 overflow-y-auto">
-                <pre className="text-sm text-neutral-300 whitespace-pre-wrap font-sans">
-                  {candidate.resume}
-                </pre>
-              </div>
+          {/* Resume Sections */}
+          {!resume ? (
+            <div className="bg-neutral-800 rounded-lg p-6 text-center">
+              <p className="text-neutral-400">No resume data available for this candidate.</p>
             </div>
+          ) : !hasResumeData ? (
+            <div className="bg-neutral-800 rounded-lg p-6 text-center">
+              <p className="text-neutral-400">Resume uploaded but no structured data was extracted.</p>
+              {resume.rawText && (
+                <details className="mt-4 text-left">
+                  <summary className="text-sm text-neutral-500 cursor-pointer hover:text-neutral-400">
+                    View raw text
+                  </summary>
+                  <pre className="mt-2 text-sm text-neutral-300 whitespace-pre-wrap font-sans bg-neutral-900 p-3 rounded max-h-48 overflow-y-auto">
+                    {resume.rawText}
+                  </pre>
+                </details>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* Skills */}
+              {resume.skills.length > 0 && (
+                <div>
+                  <label className="text-sm text-neutral-400 mb-2 block">Skills</label>
+                  <div className="flex flex-wrap gap-2">
+                    {resume.skills.map((skill, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-neutral-800 text-neutral-200 text-sm rounded-full border border-neutral-700"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Experience */}
+              {resume.experience.length > 0 && (
+                <div>
+                  <label className="text-sm text-neutral-400 mb-2 block">Experience</label>
+                  <div className="space-y-3">
+                    {resume.experience.map((exp, index) => (
+                      <div
+                        key={index}
+                        className="bg-neutral-800 rounded-lg p-4 border border-neutral-700"
+                      >
+                        <div className="flex justify-between items-start mb-1">
+                          <h4 className="text-white font-medium">{exp.role}</h4>
+                          {exp.duration && (
+                            <span className="text-neutral-400 text-sm">{exp.duration}</span>
+                          )}
+                        </div>
+                        <p className="text-neutral-300 text-sm mb-2">{exp.company}</p>
+                        {exp.description && (
+                          <p className="text-neutral-400 text-sm">{exp.description}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Education */}
+              {resume.education.length > 0 && (
+                <div>
+                  <label className="text-sm text-neutral-400 mb-2 block">Education</label>
+                  <div className="space-y-3">
+                    {resume.education.map((edu, index) => (
+                      <div
+                        key={index}
+                        className="bg-neutral-800 rounded-lg p-4 border border-neutral-700"
+                      >
+                        <div className="flex justify-between items-start mb-1">
+                          <h4 className="text-white font-medium">
+                            {edu.degree}{edu.field ? ` in ${edu.field}` : ""}
+                          </h4>
+                          {edu.graduationDate && (
+                            <span className="text-neutral-400 text-sm">{edu.graduationDate}</span>
+                          )}
+                        </div>
+                        <p className="text-neutral-300 text-sm">{edu.institution}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Raw Text (collapsible) */}
+              {resume.rawText && (
+                <details className="text-left">
+                  <summary className="text-sm text-neutral-500 cursor-pointer hover:text-neutral-400">
+                    View raw resume text
+                  </summary>
+                  <div className="mt-2 bg-neutral-800 rounded-lg p-4 max-h-48 overflow-y-auto">
+                    <pre className="text-sm text-neutral-300 whitespace-pre-wrap font-sans">
+                      {resume.rawText}
+                    </pre>
+                  </div>
+                </details>
+              )}
+            </>
           )}
         </div>
       </div>

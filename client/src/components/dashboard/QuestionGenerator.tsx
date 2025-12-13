@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Sparkles, Plus, Trash2, Pencil, Check, X, Loader2 } from "lucide-react";
 import { PILLAR_PROMPTS, PILLAR_TYPES, PillarType, getPillarPrompt } from "@/constants/pillarPrompts";
+import api from "@/services/api";
 
 interface QuestionGeneratorProps {
   agentId: string;
@@ -39,21 +40,14 @@ export function QuestionGenerator({
     setError(null);
 
     try {
-      const response = await fetch(`/api/agents/${agentId}/generate-questions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
+      const response = await api.post(`/agents/${agentId}/generate-questions`,{
           pillar: selectedPillar,
           prompt: prompt.trim(),
-        }),
       });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (!response.ok) {
+      if (!response.status) {
         throw new Error(data.message || "Failed to generate questions");
       }
 

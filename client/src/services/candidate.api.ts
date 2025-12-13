@@ -1,12 +1,36 @@
 import api from "./api";
 
+export interface ExperienceEntry {
+  company: string;
+  role: string;
+  duration: string;
+  description: string;
+}
+
+export interface EducationEntry {
+  institution: string;
+  degree: string;
+  field: string;
+  graduationDate?: string;
+}
+
+export interface ParsedResume {
+  name?: string;
+  email?: string;
+  phone?: string;
+  skills: string[];
+  experience: ExperienceEntry[];
+  education: EducationEntry[];
+  rawText: string;
+}
+
 export interface Candidate {
   _id: string;
   agentId: string | { _id: string; name: string; jobDetails?: { title: string } } | null;
   name: string;
   email: string;
   phone: string;
-  resume: string;
+  resume: ParsedResume | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,7 +40,7 @@ export interface CreateCandidateData {
   name: string;
   email: string;
   phone?: string;
-  resume?: string;
+  resume?: ParsedResume | null;
   scheduledTime?: string;
 }
 
@@ -24,7 +48,7 @@ export interface UpdateCandidateData {
   name?: string;
   email?: string;
   phone?: string;
-  resume?: string;
+  resume?: ParsedResume | null;
 }
 
 export const candidateApi = {
@@ -73,6 +97,11 @@ export const candidateApi = {
 
   removeFromAgent: async (candidateId: string): Promise<Candidate> => {
     const response = await api.post(`/candidates/${candidateId}/remove`);
+    return response.data.data;
+  },
+
+  parseResume: async (text: string): Promise<ParsedResume> => {
+    const response = await api.post("/candidates/parse-resume", { text });
     return response.data.data;
   },
 };

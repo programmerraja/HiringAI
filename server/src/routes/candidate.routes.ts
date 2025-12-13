@@ -9,6 +9,7 @@ import {
   assignCandidateToAgent,
   removeCandidateFromAgent,
   getUnassignedCandidates,
+  parseResume,
 } from '../controllers/candidate.controller';
 import { protect } from '../middleware/auth';
 
@@ -21,6 +22,9 @@ router.route('/').get(getCandidates).post(createCandidate);
 
 // Unassigned candidates route (must be before /:id to avoid conflict)
 router.route('/unassigned').get(getUnassignedCandidates);
+
+// Parse resume route (must be before /:id to avoid conflict)
+router.route('/parse-resume').post(parseResume);
 
 router.route('/:id').get(getCandidate).put(updateCandidate).delete(deleteCandidate);
 

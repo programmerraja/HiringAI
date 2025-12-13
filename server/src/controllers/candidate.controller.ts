@@ -3,6 +3,7 @@ import { Candidate } from '../models/candidate.model';
 import { Agent } from '../models/agent.model';
 import { Call } from '../models/call.model';
 import { AppError } from '../middleware/errorHandler';
+import { parseResumeText } from '../services/resume.service';
 
 // @desc    Get all candidates (optionally filter by agentId)
 // @route   GET /api/candidates
@@ -123,7 +124,7 @@ export const createCandidate = async (req: Request, res: Response, next: NextFun
       name,
       email,
       phone: phone || '',
-      resume: resume || '',
+      resume: resume || null,
     });
 
     // If agentId is provided, create a Call record
@@ -400,6 +401,45 @@ export const getUnassignedCandidates = async (req: Request, res: Response, next:
       data: candidates,
     });
   } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Parse resume text into structured JSON
+// @route   POST /api/candidates/parse-resume
+// @access  Private
+export const parseResume = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { text } = req.body;
+
+    // Validate that text is provided
+    if (!text || typeof text !== 'string') {
+      const error: AppError = new Error('Resume text is required');
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    // Validate that text is not empty or whitespace only
+    if (text.trim().length === 0) {
+      const error: AppError = new Error('Resume text is required');
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    // Parse the resume text using the resume service
+    const parsedResume = await parseResumeText(text);
+
+    res.status(200).json({
+      success: true,
+      data: parsedResume,
+    });
+  } catch (error: any) {
+    // Handle specific parsing errors
+    if (error.message?.includes('Failed to parse resume')) {
+      const appError: AppError = new Error('Failed to parse resume');
+      appError.statusCode = 500;
+      return next(appError);
+    }
     next(error);
   }
 };
