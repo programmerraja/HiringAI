@@ -1,4 +1,4 @@
-# BlazeStack Server
+# hiringai Server
 
 A robust Express.js server with MongoDB, TypeScript, and authentication.
 

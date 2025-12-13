@@ -1,5 +1,5 @@
 {
-  "name": "blazestack",
+  "name": "hiringai",
   "version": "1.0.0",
   "description": "Full-stack application with Express, MongoDB, React, and TypeScript",
   "main": "/server/dist/index.js",

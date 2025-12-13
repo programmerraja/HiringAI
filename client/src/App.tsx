@@ -5,14 +5,14 @@ import SignUpForm from "@/components/auth/SignUpForm";
 import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Home } from "@/components/Home";
+import { LandingPage } from "@/components/landing";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/signin" element={<SignInForm />} />
           <Route path="/signup" element={<SignUpForm />} />
           <Route path="/forgot-password" element={<ForgotPasswordForm />} />

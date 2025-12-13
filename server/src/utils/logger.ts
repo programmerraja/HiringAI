@@ -12,7 +12,7 @@ export const logger = winston.createLogger({
     winston.format.splat(),
     winston.format.json(),
   ),
-  defaultMeta: { service: 'blazestack-api' },
+  defaultMeta: { service: 'hiringai-api' },
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(

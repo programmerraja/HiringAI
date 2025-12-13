@@ -15,7 +15,7 @@ export function Navbar() {
     <nav className="bg-white shadow-md border-b border-gray-200">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center">
-          <h1 className="text-xl font-bold text-blue-600">BlazeStack</h1>
+          <h1 className="text-xl font-bold text-blue-600">hiringai</h1>
         </div>
 
         <div className="flex items-center gap-6">

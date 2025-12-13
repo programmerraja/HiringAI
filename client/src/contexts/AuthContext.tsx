@@ -69,11 +69,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(response.data.user);
       } else {
         setError("Login failed");
+        throw new Error("Login failed");
       }
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      const errorMessage =
+        err.response?.data?.message || "Login failed. Please try again.";
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }

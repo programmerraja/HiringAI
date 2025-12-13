@@ -5,9 +5,9 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { DollarSign } from "lucide-react";
+import { Bot } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { loginSchema, LoginFormValues } from "@/lib/validation-schemas";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -28,15 +28,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function SignInForm() {
   const navigate = useNavigate();
@@ -80,16 +71,16 @@ export default function SignInForm() {
     <div className="flex min-h-screen items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md border shadow-sm">
         <div className="flex justify-center mt-6">
-          <div className="rounded-full bg-green-100 p-3">
-            <DollarSign className="h-6 w-6 text-green-600" />
+          <div className="rounded-full bg-blue-100 p-3">
+            <Bot className="h-6 w-6 text-blue-600" />
           </div>
         </div>
         <CardHeader className="space-y-1 pt-2 pb-0">
           <CardTitle className="text-xl font-semibold text-center">
-            Sign in to your account
+            Sign in to HiringAI
           </CardTitle>
           <CardDescription className="text-center text-sm">
-            Enter your email and password to access your expense tracker
+            Enter your email and password to access your recruiter dashboard
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
@@ -147,12 +138,18 @@ export default function SignInForm() {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-center pb-6 pt-2">
+        <CardFooter className="flex flex-col items-center pb-6 pt-2 space-y-2">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-blue-600 hover:text-blue-500 font-medium"
+          >
+            Forgot Password?
+          </Link>
           <div className="text-sm text-center text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link
               to="/signup"
-              className="text-green-600 hover:text-green-500 font-medium"
+              className="text-blue-600 hover:text-blue-500 font-medium"
             >
               Sign up
             </Link>

@@ -6,7 +6,6 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
-    "@typescript-eslint/no-explicit-any": "off",
     "paths": {
       "@/*": ["./src/*"]
     }

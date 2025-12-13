@@ -1,6 +1,6 @@
-# BlazeStack Client
+# hiringai Client
 
-A modern React application with authentication UI for the BlazeStack server.
+A modern React application with authentication UI for the hiringai server.
 
 ## Features
 

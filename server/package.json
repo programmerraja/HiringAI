@@ -1,5 +1,5 @@
 {
-  "name": "blazestack-server",
+  "name": "hiringai-server",
   "version": "1.0.0",
   "description": "Express MongoDB TypeScript server with authentication",
   "main": "dist/index.js",
