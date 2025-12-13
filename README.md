@@ -42,10 +42,10 @@ graph TD
     
     B --> E{XML Master Prompt}
     
-    E --> F[<metadata>]
-    E --> G[<Persona>]
-    E --> H[<interview_flow>]
-    E --> I[<company_context>]
+    E --> F["Metadata"]
+    E --> G["Persona"]
+    E --> H["Interview Flow"]
+    E --> I["Company Context"]
     
     H --> J[Introduction]
     H --> K[Dynamic Questions]
