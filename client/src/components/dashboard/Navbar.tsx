@@ -1,8 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Bot } from "lucide-react";
-
 export function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();

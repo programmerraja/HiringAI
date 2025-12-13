@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Bot } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { loginSchema, LoginFormValues } from "@/lib/validation-schemas";
 

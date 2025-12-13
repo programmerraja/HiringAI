@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Spinner } from "@/components/ui/spinner";
-import { Bot } from "lucide-react";
 
 export function Home() {
   const { user, loading } = useAuth();

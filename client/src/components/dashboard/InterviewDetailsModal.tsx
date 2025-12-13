@@ -110,7 +110,10 @@ export function InterviewDetailsModal({ call, isOpen, onClose }: InterviewDetail
 
               {/* Dinodial Details */}
               {details?.dinodialDetails && (
-                <DinodialDetailsSection dinodialDetails={details.dinodialDetails} />
+                <DinodialDetailsSection
+                  dinodialDetails={details.dinodialDetails}
+                  analysis={details.dinodialDetails.analysis || details.call.analysis || call.analysis}
+                />
               )}
 
               {/* No Dinodial Data */}
@@ -222,9 +225,12 @@ function SystemPromptSection({ prompt }: { prompt: string }) {
 
 interface DinodialDetailsSectionProps {
   dinodialDetails: DinodialDetails;
+  analysis?: Record<string, unknown>;
 }
 
-function DinodialDetailsSection({ dinodialDetails }: DinodialDetailsSectionProps) {
+function DinodialDetailsSection({ dinodialDetails, analysis }: DinodialDetailsSectionProps) {
+  const finalAnalysis = analysis || dinodialDetails.analysis;
+
   return (
     <>
       {/* Recording Player */}
@@ -233,8 +239,8 @@ function DinodialDetailsSection({ dinodialDetails }: DinodialDetailsSectionProps
       )}
 
       {/* Analysis/Scorecard */}
-      {dinodialDetails.analysis && Object.keys(dinodialDetails.analysis).length > 0 && (
-        <ScorecardSection analysis={dinodialDetails.analysis} />
+      {finalAnalysis && Object.keys(finalAnalysis).length > 0 && (
+        <ScorecardSection analysis={finalAnalysis} />
       )}
     </>
   );
