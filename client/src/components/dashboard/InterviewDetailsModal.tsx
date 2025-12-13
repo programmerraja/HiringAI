@@ -9,12 +9,7 @@ interface InterviewDetailsModalProps {
   onClose: () => void;
 }
 
-const pillarLabels: Record<string, string> = {
-  experience: "Experience",
-  behavioral: "Behavioral",
-  role_specific: "Role-Specific",
-  cultural_fit: "Cultural Fit",
-};
+
 
 export function InterviewDetailsModal({ call, isOpen, onClose }: InterviewDetailsModalProps) {
   const [loading, setLoading] = useState(false);
@@ -66,7 +61,7 @@ export function InterviewDetailsModal({ call, isOpen, onClose }: InterviewDetail
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      
+
       {/* Modal */}
       <div className="relative bg-neutral-900 rounded-lg border border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4">
         {/* Header */}
@@ -112,7 +107,7 @@ export function InterviewDetailsModal({ call, isOpen, onClose }: InterviewDetail
           {!loading && (
             <>
               <CallInfoSection call={call} details={details} formatDate={formatDate} getStatusBadgeClass={getStatusBadgeClass} />
-              
+
               {/* Dinodial Details */}
               {details?.dinodialDetails && (
                 <DinodialDetailsSection dinodialDetails={details.dinodialDetails} />
@@ -141,15 +136,15 @@ interface CallInfoSectionProps {
 }
 
 function CallInfoSection({ call, details, formatDate, getStatusBadgeClass }: CallInfoSectionProps) {
-  const candidateName = details?.candidate?.name || 
+  const candidateName = details?.candidate?.name ||
     (typeof call.candidateId === "object" ? call.candidateId.name : "Unknown");
-  const candidateEmail = details?.candidate?.email || 
+  const candidateEmail = details?.candidate?.email ||
     (typeof call.candidateId === "object" ? call.candidateId.email : "");
-  const candidatePhone = details?.candidate?.phone || 
+  const candidatePhone = details?.candidate?.phone ||
     (typeof call.candidateId === "object" ? call.candidateId.phone : "");
-  const agentName = details?.agent?.name || 
+  const agentName = details?.agent?.name ||
     (typeof call.agentId === "object" ? call.agentId.name : "Unknown");
-  const jobTitle = details?.agent?.jobDetails?.title || 
+  const jobTitle = details?.agent?.jobDetails?.title ||
     (typeof call.agentId === "object" ? call.agentId.jobDetails?.title : "");
 
   const status = details?.dinodialDetails?.status || call.status;
@@ -228,7 +223,7 @@ function AudioPlayerSection({ recordingUrl }: AudioPlayerSectionProps) {
     const audio = new Audio(recordingUrl);
     audio.addEventListener("ended", () => setIsPlaying(false));
     setAudioElement(audio);
-    
+
     return () => {
       audio.pause();
       audio.removeEventListener("ended", () => setIsPlaying(false));
@@ -237,7 +232,7 @@ function AudioPlayerSection({ recordingUrl }: AudioPlayerSectionProps) {
 
   const togglePlay = () => {
     if (!audioElement) return;
-    
+
     if (isPlaying) {
       audioElement.pause();
     } else {
@@ -273,64 +268,299 @@ function AudioPlayerSection({ recordingUrl }: AudioPlayerSectionProps) {
   );
 }
 
-interface ScorecardSectionProps {
-  analysis: Record<string, unknown>;
+interface OverallRecommendationCardProps {
+  recommendation: string;
+  summary?: string;
 }
 
-function ScorecardSection({ analysis }: ScorecardSectionProps) {
-  const renderAnalysisValue = (value: unknown): React.ReactNode => {
-    if (typeof value === "string" || typeof value === "number") {
-      return <span className="text-neutral-300">{String(value)}</span>;
+function OverallRecommendationCard({ recommendation, summary }: OverallRecommendationCardProps) {
+  const recommendationConfig: Record<string, { color: string; textColor: string; icon: string; label: string; description: string }> = {
+    strongly_recommend: {
+      color: 'bg-gradient-to-br from-green-600 to-green-700',
+      textColor: 'text-white',
+      icon: '✅',
+      label: 'STRONG HIRE',
+      description: 'Excellent candidate - proceed immediately'
+    },
+    recommend: {
+      color: 'bg-gradient-to-br from-green-700 to-green-800',
+      textColor: 'text-white',
+      icon: '👍',
+      label: 'HIRE',
+      description: 'Good candidate - recommend for next round'
+    },
+    neutral: {
+      color: 'bg-gradient-to-br from-yellow-600 to-yellow-700',
+      textColor: 'text-white',
+      icon: '⚖️',
+      label: 'MAYBE',
+      description: 'Mixed results - review carefully'
+    },
+    not_recommend: {
+      color: 'bg-gradient-to-br from-orange-600 to-orange-700',
+      textColor: 'text-white',
+      icon: '❌',
+      label: 'PASS',
+      description: 'Does not meet requirements'
+    },
+    strongly_not_recommend: {
+      color: 'bg-gradient-to-br from-red-600 to-red-700',
+      textColor: 'text-white',
+      icon: '🚫',
+      label: 'STRONG PASS',
+      description: 'Not a fit - do not proceed'
     }
-    if (Array.isArray(value)) {
-      return (
-        <ul className="list-disc list-inside text-neutral-300 text-sm space-y-1">
-          {value.map((item, index) => (
-            <li key={index}>{String(item)}</li>
-          ))}
-        </ul>
-      );
-    }
-    if (typeof value === "object" && value !== null) {
-      return (
-        <pre className="text-neutral-300 text-xs bg-neutral-900 p-2 rounded overflow-x-auto">
-          {JSON.stringify(value, null, 2)}
-        </pre>
-      );
-    }
-    return <span className="text-neutral-500">N/A</span>;
   };
 
-  const getScoreColor = (score: unknown): string => {
-    if (typeof score !== "number") return "text-neutral-300";
-    if (score >= 8) return "text-green-400";
-    if (score >= 6) return "text-yellow-400";
-    if (score >= 4) return "text-orange-400";
-    return "text-red-400";
+  const config = recommendationConfig[recommendation] || recommendationConfig.neutral;
+
+  return (
+    <div className={`${config.color} ${config.textColor} rounded-xl p-6 text-center shadow-lg animate-fadeIn`}>
+      <p className="text-sm opacity-80 mb-2">HIRING RECOMMENDATION</p>
+      <div className="text-5xl mb-3">{config.icon}</div>
+      <h3 className="text-3xl font-bold mb-2">{config.label}</h3>
+      <p className="text-sm opacity-90 mb-3">{config.description}</p>
+      {summary && (
+        <p className="text-sm italic border-t border-white/20 pt-3 mt-3">
+          "{summary}"
+        </p>
+      )}
+    </div>
+  );
+}
+
+function PillarScoresGrid({ analysis }: { analysis: Record<string, unknown> }) {
+  const pillarEmojis: Record<string, string> = {
+    experience: '💼',
+    behavioral: '🧠',
+    role_specific: '🎯',
+    cultural_fit: '🤝'
+  };
+
+  const pillarLabels: Record<string, string> = {
+    experience: 'Experience',
+    behavioral: 'Behavioral Skills',
+    role_specific: 'Role-Specific Score',
+    cultural_fit: 'Cultural Fit'
+  };
+
+  // Extract scores from analysis
+  const scores = Object.entries(analysis)
+    .filter(([key]) => key.includes('_score'))
+    .map(([key, value]) => ({
+      pillar: key.replace('_score', ''),
+      score: value as number,
+      notes: analysis[`${key.replace('_score', '')}_notes`] as string || ''
+    }));
+
+  const getScoreColor = (score: number) => {
+    if (score >= 8) return 'bg-green-500';
+    if (score >= 6) return 'bg-yellow-500';
+    if (score >= 4) return 'bg-orange-500';
+    return 'bg-red-500';
+  };
+
+  const getScoreTextColor = (score: number) => {
+    if (score >= 8) return 'text-green-400';
+    if (score >= 6) return 'text-yellow-400';
+    if (score >= 4) return 'text-orange-400';
+    return 'text-red-400';
   };
 
   return (
-    <div className="bg-neutral-800 rounded-lg p-4">
-      <h3 className="text-sm font-medium text-neutral-400 mb-3">Scorecard & Analysis</h3>
-      <div className="space-y-4">
-        {Object.entries(analysis).map(([key, value]) => {
-          const label = pillarLabels[key] || key.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-          const isScore = key.toLowerCase().includes("score") || (typeof value === "number" && value <= 10);
-          
-          return (
-            <div key={key} className="border-b border-neutral-700 pb-3 last:border-0 last:pb-0">
-              <div className="flex items-center justify-between mb-1">
-                <p className="text-neutral-400 text-sm font-medium">{label}</p>
-                {isScore && typeof value === "number" && (
-                  <span className={`text-lg font-bold ${getScoreColor(value)}`}>
-                    {value}/10
-                  </span>
-                )}
+    <div className="bg-neutral-800 rounded-lg p-6 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+      <h3 className="text-sm font-medium text-neutral-400 mb-4 flex items-center gap-2">
+        📊 ASSESSMENT BREAKDOWN
+      </h3>
+      <div className="space-y-5">
+        {scores.map(({ pillar, score, notes }) => (
+          <div key={pillar} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">{pillarEmojis[pillar] || '📋'}</span>
+                <span className="text-white font-medium">
+                  {pillarLabels[pillar] || pillar.replace(/_/g, ' ')}
+                </span>
               </div>
-              {!isScore && renderAnalysisValue(value)}
+              <span className={`text-xl font-bold ${getScoreTextColor(score)}`}>
+                {score}/10
+              </span>
             </div>
-          );
-        })}
+
+            {/* Progress Bar */}
+            <div className="relative h-3 bg-neutral-700 rounded-full overflow-hidden">
+              <div
+                className={`absolute inset-y-0 left-0 ${getScoreColor(score)} rounded-full transition-all duration-1000 ease-out`}
+                style={{ width: `${score * 10}%` }}
+              />
+            </div>
+
+            {/* Short notes preview (if available) */}
+            {notes && (
+              <p className="text-neutral-400 text-sm line-clamp-2 leading-relaxed">
+                {notes}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function KeyInsightsPanel({ analysis }: { analysis: Record<string, unknown> }) {
+  // Extract key points from notes fields
+  const extractKeyPoints = (text: string, isPositive: boolean): string[] => {
+    if (!text) return [];
+
+    // Simple keyword-based extraction
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
+
+    const keywords = isPositive
+      ? ['strong', 'excellent', 'good', 'proficient', 'experienced', 'demonstrated', 'effective', 'clear']
+      : ['limited', 'weak', 'lack', 'concern', 'unfamiliar', 'inexperienced', 'failed', 'could not', 'struggled'];
+
+    return sentences
+      .filter(sentence =>
+        keywords.some(keyword =>
+          sentence.toLowerCase().includes(keyword)
+        )
+      )
+      .slice(0, 3)
+      .map(s => s.trim());
+  };
+
+  // Combine all notes
+  const allNotes = Object.entries(analysis)
+    .filter(([key]) => key.includes('_notes'))
+    .map(([_, value]) => value as string)
+    .join('. ');
+
+  const strengths = extractKeyPoints(allNotes, true);
+  const concerns = extractKeyPoints(allNotes, false);
+
+  if (strengths.length === 0 && concerns.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="bg-neutral-800 rounded-lg p-6 animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+      <h3 className="text-sm font-medium text-neutral-400 mb-4 flex items-center gap-2">
+        💡 KEY INSIGHTS
+      </h3>
+
+      <div className="space-y-6">
+        {/* Strengths */}
+        {strengths.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-green-400 text-lg">✅</span>
+              <h4 className="text-green-400 font-medium">Strengths</h4>
+            </div>
+            <ul className="space-y-2 ml-2 pl-4 border-l border-green-900/50">
+              {strengths.map((strength, idx) => (
+                <li key={idx} className="text-neutral-300 text-sm leading-relaxed">
+                  {strength}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Concerns */}
+        {concerns.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-orange-400 text-lg">⚠️</span>
+              <h4 className="text-orange-400 font-medium">Areas of Concern</h4>
+            </div>
+            <ul className="space-y-2 ml-2 pl-4 border-l border-orange-900/50">
+              {concerns.map((concern, idx) => (
+                <li key={idx} className="text-neutral-300 text-sm leading-relaxed">
+                  {concern}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function InterviewStats({ analysis, duration }: { analysis: Record<string, unknown>; duration?: number }) {
+  const scores = Object.entries(analysis)
+    .filter(([key]) => key.includes('_score'))
+    .map(([_, value]) => value as number);
+
+  const averageScore = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  const passRate = scores.length > 0 ? ((scores.filter(s => s >= 6).length / scores.length) * 100) : 0;
+
+  if (scores.length === 0) return null;
+
+  return (
+    <div className="grid grid-cols-3 gap-4 mb-2 animate-fadeIn">
+      <div className="bg-neutral-800 rounded-lg p-4 text-center">
+        <p className="text-neutral-500 text-xs mb-1 uppercase tracking-in-wider">Average Score</p>
+        <p className="text-2xl font-bold text-white">
+          {averageScore.toFixed(1)}
+          <span className="text-sm text-neutral-500 font-normal ml-1">/10</span>
+        </p>
+      </div>
+      <div className="bg-neutral-800 rounded-lg p-4 text-center">
+        <p className="text-neutral-500 text-xs mb-1 uppercase tracking-wider">Pass Rate</p>
+        <p className={`${passRate >= 70 ? 'text-green-400' : 'text-yellow-400'} text-2xl font-bold`}>
+          {passRate.toFixed(0)}
+          <span className="text-sm text-neutral-500 font-normal ml-1">%</span>
+        </p>
+      </div>
+      <div className="bg-neutral-800 rounded-lg p-4 text-center">
+        <p className="text-neutral-500 text-xs mb-1 uppercase tracking-wider">Duration</p>
+        <p className="text-2xl font-bold text-white">
+          {duration ? Math.round(duration / 60) : '--'}
+          <span className="text-sm text-neutral-500 font-normal ml-1">min</span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+interface ScorecardSectionProps {
+  analysis: Record<string, unknown>;
+  duration?: number;
+}
+
+function ScorecardSection({ analysis }: ScorecardSectionProps) {
+  // Check if we have valid analysis data
+  const hasScores = Object.keys(analysis).some(k => k.includes('_score'));
+
+  if (!hasScores) {
+    return (
+      <div className="bg-neutral-800 rounded-lg p-6 text-center">
+        <p className="text-neutral-400">Analysis pending or unavailable.</p>
+      </div>
+    );
+  }
+
+  const recommendation = analysis.overall_recommendation as string;
+  const summary = analysis.summary as string;
+  const duration = (analysis as any).duration;
+
+  return (
+    <div className="space-y-6">
+      {/* Stats Summary */}
+      <InterviewStats analysis={analysis} duration={duration} />
+
+      {/* Overall Recommendation - Most Prominent */}
+      <OverallRecommendationCard
+        recommendation={recommendation}
+        summary={summary}
+      />
+
+      {/* Two-column layout for Scores and Insights */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <PillarScoresGrid analysis={analysis} />
+        <KeyInsightsPanel analysis={analysis} />
       </div>
     </div>
   );

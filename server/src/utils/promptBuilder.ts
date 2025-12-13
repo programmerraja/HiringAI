@@ -46,11 +46,23 @@ function getPersonaConfig(persona: 'formal' | 'casual'): {
  * Requirements: 5.1, 5.2, 5.3, 5.4, 5.5
  */
 export function buildXMLPrompt(agent: IAgent, candidate: ICandidate): string {
+  // Check for XML override
+  if (agent.prompt && agent.prompt.trim().startsWith('<?xml')) {
+    // Inject candidate name into the override if possible, or just return it
+    // For safety, simple replacement of placeholder if it exists, otherwise return as is
+    return agent.prompt.replace('[Candidate Name]', escapeXml(candidate.name));
+  }
+
   const personaConfig = getPersonaConfig(agent.persona);
-  
+
   const questionsXml = agent.questions
     .map((q, i) => `      <question order="${i + 1}">${escapeXml(q)}</question>`)
     .join('\n');
+
+  // Inject custom instructions if they exist
+  const customInstructions = agent.prompt
+    ? `\n    <custom_instructions>\n      ${escapeXml(agent.prompt)}\n    </custom_instructions>`
+    : '';
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <ai_master_prompt>
@@ -76,7 +88,7 @@ export function buildXMLPrompt(agent: IAgent, candidate: ICandidate): string {
   <interview_flow>
     <introduction>
       Greet the candidate by name and introduce yourself as the AI interviewer for the ${escapeXml(agent.jobDetails.title)} position.
-    </introduction>
+    </introduction>${customInstructions}
     <questions>
 ${questionsXml}
     </questions>

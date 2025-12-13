@@ -17,8 +17,15 @@ export interface GenerateQuestionsParams {
   jobDescription?: string;
 }
 
+export interface QuestionWithMetadata {
+  text: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  time: string;
+  category: string;
+}
+
 export interface GenerateQuestionsResult {
-  questions: string[];
+  questions: QuestionWithMetadata[];
 }
 
 /**
@@ -47,14 +54,24 @@ Please generate 5 relevant interview questions based on the above context. The q
 - Clear and specific
 - Open-ended to encourage detailed responses
 - Appropriate for the "${pillar}" interview pillar
-- Relevant to the job role`;
+- Relevant to the job role
+
+For each question, estimate:
+- Difficulty: Easy, Medium, or Hard
+- Time: Estimated seconds to answer (e.g. "60s", "120s")
+- Category: A sub-category tag (e.g. "Technical", "Leadership", "Problem Solving")`;
 
     const response = await generateObject({
-      model: google('gemini-1.5-flash'),
+      model: google('models/gemini-flash-latest'),
       schemaName: 'interviewQuestions',
-      schemaDescription: 'Generated interview questions for a specific pillar',
+      schemaDescription: 'Generated interview questions with metadata',
       schema: z.object({
-        questions: z.array(z.string()).describe('List of generated interview questions'),
+        questions: z.array(z.object({
+          text: z.string().describe('The interview question text'),
+          difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe('Estimated difficulty level'),
+          time: z.string().describe('Estimated time to answer in seconds (e.g. 60s)'),
+          category: z.string().describe('Sub-category or tag for the question')
+        })).describe('List of generated interview questions with metadata'),
       }),
       prompt: fullPrompt,
     });

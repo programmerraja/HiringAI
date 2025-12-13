@@ -7,6 +7,7 @@ export interface ICall extends Document {
   scheduledTime: Date;
   recordingUrl: string;
   dinodialCallId: number | null;
+  analysis?: any;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,6 +43,9 @@ const callSchema = new Schema<ICall>(
     dinodialCallId: {
       type: Number,
       default: null,
+    },
+    analysis: {
+      type: Schema.Types.Mixed,
     },
   },
   {

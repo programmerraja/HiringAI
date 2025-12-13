@@ -103,7 +103,6 @@ export const getCallsByAgent = async (req: Request, res: Response, next: NextFun
       .populate('candidateId', 'name email phone')
       .sort({ scheduledTime: -1 });
 
-    // Sync status from Dinodial for in_progress calls
     const statusMap: Record<string, 'scheduled' | 'in_progress' | 'completed' | 'failed'> = {
       initiated: 'in_progress',
       in_progress: 'in_progress',
@@ -116,10 +115,10 @@ export const getCallsByAgent = async (req: Request, res: Response, next: NextFun
         try {
           const dinodialDetails = await dinodialService.getCallDetail(call.dinodialCallId);
           const mappedStatus = statusMap[dinodialDetails.status] || call.status;
-          
+
           if (call.status !== mappedStatus) {
             call.status = mappedStatus;
-            
+
             // Fetch recording URL when call completes
             if (mappedStatus === 'completed') {
               try {
@@ -130,7 +129,7 @@ export const getCallsByAgent = async (req: Request, res: Response, next: NextFun
                 logger.error(`Failed to fetch recording URL for call ${call._id}`);
               }
             }
-            
+
             await call.save();
             logger.info(`Call ${call._id} status synced from Dinodial: ${mappedStatus}`);
           }

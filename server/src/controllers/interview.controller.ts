@@ -190,7 +190,7 @@ export const getCallDetails = async (req: Request, res: Response, next: NextFunc
     if (call.dinodialCallId !== null) {
       try {
         const dinodialDetails = await dinodialService.getCallDetail(call.dinodialCallId);
-        
+
         // Map Dinodial status to our status if needed
         const statusMap: Record<string, 'scheduled' | 'in_progress' | 'completed' | 'failed'> = {
           initiated: 'in_progress',
@@ -202,7 +202,7 @@ export const getCallDetails = async (req: Request, res: Response, next: NextFunc
         // Update local call status if it changed
         const mappedStatus = statusMap[dinodialDetails.status] || call.status;
         let needsSave = false;
-        
+
         if (call.status !== mappedStatus) {
           call.status = mappedStatus;
           needsSave = true;
@@ -233,6 +233,10 @@ export const getCallDetails = async (req: Request, res: Response, next: NextFunc
         // Only include analysis if call is completed
         if (dinodialDetails.status === 'completed' && dinodialDetails.analysis) {
           response.data.dinodialDetails.analysis = dinodialDetails.analysis;
+          if (!call.analysis) {
+            call.analysis = dinodialDetails.analysis;
+            needsSave = true;
+          }
         }
 
         // Include recording URL if available (from DB or freshly fetched)

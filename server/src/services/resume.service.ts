@@ -2,12 +2,12 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { logger } from '../utils/logger';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 
-// Initialize OpenAI with Azure endpoint (same as question.service.ts)
-const openai = createOpenAI({
-  baseURL: 'https://models.inference.ai.azure.com',
-  apiKey: process.env.OPENAI_API_KEY || '',
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GOOGLE_API_KEY || '',
 });
+
 
 // Zod schema for experience entry
 const experienceEntrySchema = z.object({
@@ -70,7 +70,7 @@ Resume text:
 ${text}`;
 
     const response = await generateObject({
-      model: openai('gpt-4o'),
+      model: google('models/gemini-flash-latest'),
       schemaName: 'parsedResume',
       schemaDescription: 'Structured resume data extracted from raw text',
       schema: parsedResumeSchema,

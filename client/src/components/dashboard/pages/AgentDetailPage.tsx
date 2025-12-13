@@ -8,7 +8,8 @@ import { callApi, Call } from "@/services/call.api";
 import { interviewApi } from "@/services/interview.api";
 import { QuestionGenerator } from "@/components/dashboard/QuestionGenerator";
 import { InterviewDetailsModal } from "@/components/dashboard/InterviewDetailsModal";
-import { UserPlus, UserMinus, Calendar, Clock, Play, Eye, RefreshCw, Volume2 } from "lucide-react";
+import { PromptPreviewModal } from "@/components/dashboard/PromptPreviewModal";
+import { UserPlus, UserMinus, Calendar, Clock, Play, Eye, RefreshCw, Volume2, TrendingUp, Target, Copy, Download, Check, Pause } from "lucide-react";
 
 type TabType = "config" | "candidates" | "calls";
 
@@ -219,7 +220,7 @@ export function AgentDetailPage() {
   }
 
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-full">
       <button
         onClick={() => navigate("/dashboard/agents")}
         className="flex items-center gap-2 text-neutral-400 hover:text-white mb-6 transition-colors"
@@ -229,18 +230,32 @@ export function AgentDetailPage() {
       </button>
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">{agent.name}</h1>
-        {activeTab === "config" && (
-          <Button
-            onClick={handleSave}
-            disabled={saving}
-            className="gap-2 bg-white text-black hover:bg-neutral-200"
-          >
-            <Save className="h-4 w-4" />
-            {saving ? "Saving..." : "Save Changes"}
-          </Button>
-        )}
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold text-white">{agent.name}</h1>
+          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${agent.status === 'active'
+            ? 'bg-green-900/30 text-green-300 border-green-800'
+            : 'bg-neutral-800 text-neutral-400 border-neutral-700'
+            }`}>
+            {agent.status.toUpperCase()}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <QuickActions agent={agent} onUpdate={fetchAgent} />
+          {activeTab === "config" && (
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="gap-2 bg-white text-black hover:bg-neutral-200"
+            >
+              <Save className="h-4 w-4" />
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+          )}
+        </div>
       </div>
+
+      <AgentStatistics agentId={id!} />
 
       {error && (
         <div className="mb-6 p-3 bg-red-900/50 border border-red-800 rounded-lg text-red-200 text-sm">
@@ -254,11 +269,10 @@ export function AgentDetailPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors flex-1 justify-center ${
-              activeTab === tab.id
-                ? "bg-white text-black"
-                : "text-neutral-400 hover:text-white hover:bg-neutral-800"
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors flex-1 justify-center ${activeTab === tab.id
+              ? "bg-white text-black"
+              : "text-neutral-400 hover:text-white hover:bg-neutral-800"
+              }`}
           >
             <tab.icon className="h-4 w-4" />
             {tab.label}
@@ -330,9 +344,9 @@ function ConfigTab({
   formData,
   setFormData,
   togglePillar,
-  allPillars,
-  pillarLabels,
 }: ConfigTabProps) {
+  const [showPreview, setShowPreview] = useState(false);
+
   const handleQuestionsChange = (questions: string[]) => {
     setFormData((prev) => ({ ...prev, questions }));
   };
@@ -376,22 +390,10 @@ function ConfigTab({
       {/* Assessment Pillars */}
       <div className="bg-neutral-900 rounded-lg border border-neutral-800 p-6">
         <h2 className="text-lg font-semibold text-white mb-4">Assessment Pillars</h2>
-        <div className="flex flex-wrap gap-2">
-          {allPillars.map((pillar) => (
-            <button
-              key={pillar}
-              type="button"
-              onClick={() => togglePillar(pillar)}
-              className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-                formData.pillars.includes(pillar)
-                  ? "bg-white text-black"
-                  : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
-              }`}
-            >
-              {pillarLabels[pillar]}
-            </button>
-          ))}
-        </div>
+        <PillarSelector
+          selectedPillars={formData.pillars}
+          onToggle={togglePillar}
+        />
       </div>
 
       {/* Persona */}
@@ -401,22 +403,20 @@ function ConfigTab({
           <button
             type="button"
             onClick={() => setFormData({ ...formData, persona: "formal" })}
-            className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-              formData.persona === "formal"
-                ? "bg-white text-black"
-                : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm transition-colors ${formData.persona === "formal"
+              ? "bg-white text-black"
+              : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+              }`}
           >
             Formal & Professional
           </button>
           <button
             type="button"
             onClick={() => setFormData({ ...formData, persona: "casual" })}
-            className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-              formData.persona === "casual"
-                ? "bg-white text-black"
-                : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm transition-colors ${formData.persona === "casual"
+              ? "bg-white text-black"
+              : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+              }`}
           >
             Casual & Friendly
           </button>
@@ -433,9 +433,18 @@ function ConfigTab({
 
       {/* System Prompt */}
       <div className="bg-neutral-900 rounded-lg border border-neutral-800 p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">System Prompt</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">System Prompt</h2>
+          <button
+            onClick={() => setShowPreview(true)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg text-sm transition-colors border border-neutral-700"
+          >
+            <Eye className="h-4 w-4" />
+            Preview & Edit
+          </button>
+        </div>
         <p className="text-neutral-400 text-sm mb-3">
-          Custom instructions for the AI interviewer (optional)
+          Custom instructions for the AI interviewer. Click Preview to see the full generated XML.
         </p>
         <textarea
           value={formData.prompt}
@@ -444,7 +453,25 @@ function ConfigTab({
           placeholder="Enter custom instructions for the AI interviewer..."
           className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-600 resize-none font-mono text-sm"
         />
+        {formData.prompt.trim().startsWith('<?xml') && (
+          <p className="mt-2 text-xs text-yellow-400 flex items-center gap-1">
+            ⚠️ Custom XML override active. The standard prompt generation will be bypassed.
+          </p>
+        )}
       </div>
+
+      <PromptPreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        agentData={{
+          ...formData,
+          jobDetails: {
+            title: formData.jobTitle,
+            description: formData.jobDescription,
+          },
+        }}
+        onSave={(newPrompt) => setFormData({ ...formData, prompt: newPrompt })}
+      />
     </div>
   );
 }
@@ -588,7 +615,7 @@ function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass, onCall
   // Polling for in_progress calls (30 second interval)
   useEffect(() => {
     const hasInProgressCalls = calls.some(call => call.status === "in_progress");
-    
+
     if (!hasInProgressCalls) return;
 
     const pollInterval = setInterval(() => {
@@ -609,7 +636,7 @@ function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass, onCall
     e.stopPropagation(); // Prevent card expansion
     setInitiatingCallId(callId);
     setInitiateError(null);
-    
+
     try {
       await interviewApi.initiateCall(callId);
       onCallUpdated(); // Refresh calls list to show updated status
@@ -793,6 +820,233 @@ function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass, onCall
           onClose={() => setDetailsModalCall(null)}
         />
       )}
+    </div>
+  );
+}
+
+// --- New Dashboard Components ---
+
+function AgentStatistics({ agentId }: { agentId: string }) {
+  const [stats, setStats] = useState({
+    totalCandidates: 0,
+    completedInterviews: 0,
+    averageScore: 0,
+    hireRate: 0
+  });
+
+  useEffect(() => {
+    fetchStats();
+  }, [agentId]);
+
+  const fetchStats = async () => {
+    try {
+      // Fetch calls for this agent using the existing API
+      const calls = await callApi.getByAgent(agentId);
+      const completedAll = calls.filter(c => c.status === 'completed');
+      const analyzedSubset = completedAll.filter(c => c.analysis);
+
+      let totalScoreSum = 0;
+      let hiredCount = 0;
+
+      analyzedSubset.forEach(call => {
+        const analysis = call.analysis;
+
+        // Calculate hire rate based on recommendation
+        if (analysis.overall_recommendation === 'recommend' || analysis.overall_recommendation === 'strongly_recommend') {
+          hiredCount++;
+        }
+
+        // Calculate average score for this call
+        let callScoreSum = 0;
+        let scoreCount = 0;
+
+        Object.keys(analysis).forEach(key => {
+          if (key.endsWith('_score') && typeof analysis[key] === 'number') {
+            callScoreSum += analysis[key];
+            scoreCount++;
+          }
+        });
+
+        if (scoreCount > 0) {
+          totalScoreSum += (callScoreSum / scoreCount);
+        }
+      });
+
+      const avgScore = analyzedSubset.length > 0 ? (totalScoreSum / analyzedSubset.length) : 0;
+      const hRate = analyzedSubset.length > 0 ? Math.round((hiredCount / analyzedSubset.length) * 100) : 0;
+
+      setStats({
+        totalCandidates: calls.length,
+        completedInterviews: completedAll.length,
+        averageScore: avgScore,
+        hireRate: hRate
+      });
+    } catch (err) {
+      console.error("Failed to fetch stats", err);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-fadeIn">
+      <StatCard
+        icon={<Users className="h-5 w-5" />}
+        label="Total Candidates"
+        value={stats.totalCandidates}
+        color="blue"
+      />
+      <StatCard
+        icon={<Phone className="h-5 w-5" />}
+        label="Interviews Done"
+        value={stats.completedInterviews}
+        color="green"
+      />
+      <StatCard
+        icon={<TrendingUp className="h-5 w-5" />}
+        label="Avg Score"
+        value={`${stats.averageScore.toFixed(1)}/10`}
+        color="purple"
+      />
+      <StatCard
+        icon={<Target className="h-5 w-5" />}
+        label="Hire Rate"
+        value={`${stats.hireRate}%`}
+        color="orange"
+      />
+    </div>
+  );
+}
+
+function StatCard({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: string | number, color: string }) {
+  const colors: Record<string, string> = {
+    blue: 'bg-blue-900/30 border-blue-800 text-blue-300',
+    green: 'bg-green-900/30 border-green-800 text-green-300',
+    purple: 'bg-purple-900/30 border-purple-800 text-purple-300',
+    orange: 'bg-orange-900/30 border-orange-800 text-orange-300'
+  };
+
+  return (
+    <div className={`${colors[color]} border rounded-lg p-4`}>
+      <div className="flex items-center gap-2 mb-2">
+        {icon}
+        <p className="text-xs opacity-80">{label}</p>
+      </div>
+      <p className="text-2xl font-bold text-white">{value}</p>
+    </div>
+  );
+}
+
+function QuickActions({ agent, onUpdate }: { agent: Agent; onUpdate: () => void }) {
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const toggleStatus = async () => {
+    setIsUpdating(true);
+    try {
+      const newStatus = agent.status === 'active' ? 'paused' : 'active';
+      await agentApi.updateStatus(agent._id, newStatus);
+      onUpdate();
+    } catch (error) {
+      console.error('Failed to update status');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      <button
+        onClick={toggleStatus}
+        disabled={isUpdating}
+        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${agent.status === 'active'
+          ? 'bg-green-900/30 text-green-300 border border-green-800 hover:bg-green-900/50'
+          : 'bg-neutral-800 text-neutral-400 border border-neutral-700 hover:bg-neutral-700'
+          }`}
+      >
+        {agent.status === 'active' ? (
+          <><Check className="h-4 w-4" /> Active</>
+        ) : (
+          <><Pause className="h-4 w-4" /> Paused</>
+        )}
+      </button>
+
+      <button
+        className="px-3 py-1.5 bg-neutral-800 text-neutral-300 border border-neutral-700 rounded-lg text-sm hover:bg-neutral-700"
+        title="Duplicate this agent"
+      >
+        <Copy className="h-4 w-4" />
+      </button>
+
+      <button
+        className="px-3 py-1.5 bg-neutral-800 text-neutral-300 border border-neutral-700 rounded-lg text-sm hover:bg-neutral-700"
+        title="Export interview results"
+      >
+        <Download className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
+function PillarSelector({ selectedPillars, onToggle }: {
+  selectedPillars: string[];
+  onToggle: (pillar: string) => void;
+}) {
+  const pillars = [
+    {
+      id: 'experience',
+      icon: '💼',
+      label: 'Experience',
+      description: 'Work history & expertise'
+    },
+    {
+      id: 'behavioral',
+      icon: '🧠',
+      label: 'Behavioral',
+      description: 'Soft skills & teamwork'
+    },
+    {
+      id: 'role_specific',
+      icon: '🎯',
+      label: 'Role-Specific',
+      description: 'Technical & job skills'
+    },
+    {
+      id: 'cultural_fit',
+      icon: '🤝',
+      label: 'Cultural Fit',
+      description: 'Values & work style'
+    }
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {pillars.map(pillar => {
+        const isSelected = selectedPillars.includes(pillar.id);
+
+        return (
+          <button
+            key={pillar.id}
+            type="button"
+            onClick={() => onToggle(pillar.id)}
+            className={`p-4 rounded-lg border-2 transition-all text-left ${isSelected
+              ? 'border-white bg-white text-black'
+              : 'border-neutral-700 bg-neutral-800 text-neutral-400 hover:border-neutral-600'
+              }`}
+          >
+            <div className="text-3xl mb-2">{pillar.icon}</div>
+            <h4 className="font-semibold mb-1">{pillar.label}</h4>
+            <p className={`text-xs ${isSelected ? 'text-black/70' : 'text-neutral-500'}`}>
+              {pillar.description}
+            </p>
+
+            {isSelected && (
+              <div className="mt-2 text-right">
+                <span className="inline-block px-2 py-0.5 bg-black/10 rounded-full text-xs font-medium">
+                  ✓ Selected
+                </span>
+              </div>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -10,6 +10,7 @@ export interface Call {
   scheduledTime: string;
   recordingUrl?: string;
   dinodialCallId: number | null;
+  analysis?: any;
   createdAt: string;
   updatedAt: string;
 }
