@@ -90,6 +90,7 @@ export const initiateCall = async (req: Request, res: Response, next: NextFuncti
       // Update call record with Dinodial ID and status
       call.dinodialCallId = dinodialResponse.data.id;
       call.status = 'in_progress';
+      call.prompt = prompt;
       await call.save();
 
       logger.info(`Interview initiated for call ${id}, dinodialCallId: ${dinodialResponse.data.id}`);

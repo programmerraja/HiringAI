@@ -45,7 +45,7 @@ class DinodialService {
 
     try {
       logger.info(`Initiating Dinodial call to ${phoneNumber.substring(0, 4)}****`);
-      
+
       const response = await this.client.post<DinodialCallResponse>(
         '/api/proxy/make-call/',
         requestBody
@@ -54,6 +54,9 @@ class DinodialService {
       logger.info(`Dinodial call initiated successfully, id: ${response.data.data.id}`);
       return response.data;
     } catch (error) {
+      // if (error.response?.data?.status_code === 429) {
+      //   throw new Error("Too many requests try again");
+      // }
       this.handleError(error, 'makeCall');
       throw error; // Re-throw after logging
     }
@@ -68,8 +71,8 @@ class DinodialService {
   async getCallDetail(dinodialCallId: number): Promise<DinodialCallDetail> {
     try {
       logger.info(`Fetching Dinodial call details for id: ${dinodialCallId}`);
-      
-      const response = await this.client.get<{data:DinodialCallDetail}>(
+
+      const response = await this.client.get<{ data: DinodialCallDetail }>(
         `/api/proxy/call/detail/${dinodialCallId}/`
       );
 
@@ -89,8 +92,8 @@ class DinodialService {
   async getRecordingUrl(dinodialCallId: number): Promise<string> {
     try {
       logger.info(`Fetching recording URL for Dinodial call id: ${dinodialCallId}`);
-      
-      const response = await this.client.get<{data:{recording_url: string} }>(
+
+      const response = await this.client.get<{ data: { recording_url: string } }>(
         `/api/proxy/recording-url/${dinodialCallId}/`
       );
 

@@ -360,7 +360,7 @@ function AddCandidateForm({
             />
           </div>
           <div>
-            <label className="block text-sm text-neutral-300 mb-1">Phone (optional)</label>
+            <label className="block text-sm text-neutral-300 mb-1">Phone *</label>
             <input
               type="tel"
               value={formData.phone}

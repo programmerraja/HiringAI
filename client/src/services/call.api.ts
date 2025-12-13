@@ -11,6 +11,7 @@ export interface Call {
   recordingUrl?: string;
   dinodialCallId: number | null;
   analysis?: any;
+  prompt?: string;
   createdAt: string;
   updatedAt: string;
 }

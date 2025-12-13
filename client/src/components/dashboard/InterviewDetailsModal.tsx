@@ -186,7 +186,36 @@ function CallInfoSection({ call, details, formatDate, getStatusBadgeClass }: Cal
             <p className="text-neutral-300">{Math.round(details.dinodialDetails.duration / 60)} min</p>
           </div>
         )}
+
+        {/* System Prompt Section */}
+        {call.prompt && (
+          <div className="col-span-2 mt-2 pt-3 border-t border-neutral-700">
+            <SystemPromptSection prompt={call.prompt} />
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+function SystemPromptSection({ prompt }: { prompt: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 text-xs font-medium text-neutral-400 hover:text-white transition-colors w-full text-left"
+      >
+        <span>{isOpen ? '▼' : '▶'}</span>
+        View System Prompt sent to AI
+      </button>
+
+      {isOpen && (
+        <div className="mt-2 bg-neutral-900 rounded p-3 text-xs font-mono text-neutral-300 max-h-60 overflow-y-auto whitespace-pre-wrap border border-neutral-700">
+          {prompt}
+        </div>
+      )}
     </div>
   );
 }
