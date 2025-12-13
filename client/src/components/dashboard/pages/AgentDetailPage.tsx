@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { agentApi, Agent } from "@/services/agent.api";
 import { candidateApi, Candidate } from "@/services/candidate.api";
 import { callApi, Call } from "@/services/call.api";
+import { interviewApi } from "@/services/interview.api";
 import { QuestionGenerator } from "@/components/dashboard/QuestionGenerator";
-import { UserPlus, UserMinus, Calendar, Clock, ExternalLink } from "lucide-react";
+import { InterviewDetailsModal } from "@/components/dashboard/InterviewDetailsModal";
+import { UserPlus, UserMinus, Calendar, Clock, Play, Eye, RefreshCw, Volume2 } from "lucide-react";
 
 type TabType = "config" | "candidates" | "calls";
 
@@ -297,6 +299,7 @@ export function AgentDetailPage() {
           callsLoading={callsLoading}
           formatDate={formatDate}
           getStatusBadgeClass={getStatusBadgeClass}
+          onCallUpdated={fetchCalls}
         />
       )}
     </div>
@@ -572,10 +575,60 @@ interface CallsTabProps {
   callsLoading: boolean;
   formatDate: (dateString: string) => string;
   getStatusBadgeClass: (status: string) => string;
+  onCallUpdated: () => void;
 }
 
-function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass }: CallsTabProps) {
+function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass, onCallUpdated }: CallsTabProps) {
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
+  const [initiatingCallId, setInitiatingCallId] = useState<string | null>(null);
+  const [initiateError, setInitiateError] = useState<string | null>(null);
+  const [detailsModalCall, setDetailsModalCall] = useState<Call | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Polling for in_progress calls (30 second interval)
+  useEffect(() => {
+    const hasInProgressCalls = calls.some(call => call.status === "in_progress");
+    
+    if (!hasInProgressCalls) return;
+
+    const pollInterval = setInterval(() => {
+      onCallUpdated();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [calls, onCallUpdated]);
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    await onCallUpdated();
+    // Small delay to show the refresh animation
+    setTimeout(() => setIsRefreshing(false), 500);
+  };
+
+  const handleStartInterview = async (e: React.MouseEvent, callId: string) => {
+    e.stopPropagation(); // Prevent card expansion
+    setInitiatingCallId(callId);
+    setInitiateError(null);
+    
+    try {
+      await interviewApi.initiateCall(callId);
+      onCallUpdated(); // Refresh calls list to show updated status
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setInitiateError(error.response?.data?.message || "Failed to start interview");
+    } finally {
+      setInitiatingCallId(null);
+    }
+  };
+
+  const handleViewDetails = (e: React.MouseEvent, call: Call) => {
+    e.stopPropagation(); // Prevent card expansion
+    setDetailsModalCall(call);
+  };
+
+  const canStartInterview = (call: Call): boolean => {
+    return call.status === "scheduled" && !call.dinodialCallId;
+  };
 
   if (callsLoading) {
     return (
@@ -601,12 +654,30 @@ function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass }: Call
 
   return (
     <div className="space-y-6">
+      {/* Error Message */}
+      {initiateError && (
+        <div className="p-3 bg-red-900/50 border border-red-800 rounded-lg text-red-200 text-sm">
+          {initiateError}
+        </div>
+      )}
+
       {/* Calls List */}
       <div className="bg-neutral-900 rounded-lg border border-neutral-800 p-6">
-        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
-          Scheduled Calls
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Scheduled Calls
+          </h2>
+          <button
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors disabled:opacity-50"
+            title="Refresh calls"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
+        </div>
         {calls.length === 0 ? (
           <p className="text-neutral-500 text-sm">No calls scheduled for this agent yet</p>
         ) : (
@@ -625,6 +696,36 @@ function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass }: Call
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
+                    {/* Start Interview Button */}
+                    {canStartInterview(call) && (
+                      <button
+                        onClick={(e) => handleStartInterview(e, call._id)}
+                        disabled={initiatingCallId === call._id}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-500 disabled:bg-green-800 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        {initiatingCallId === call._id ? (
+                          <>
+                            <div className="animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full"></div>
+                            Starting...
+                          </>
+                        ) : (
+                          <>
+                            <Play className="h-3.5 w-3.5" />
+                            Start Interview
+                          </>
+                        )}
+                      </button>
+                    )}
+                    {/* View Details Button */}
+                    {call.dinodialCallId && (
+                      <button
+                        onClick={(e) => handleViewDetails(e, call)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        View Details
+                      </button>
+                    )}
                     <div className="text-right">
                       <div className="flex items-center gap-1 text-neutral-300 text-sm">
                         <Clock className="h-3.5 w-3.5" />
@@ -653,18 +754,26 @@ function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass }: Call
                         <p className="text-neutral-500">Created</p>
                         <p className="text-neutral-300">{formatDate(call.createdAt)}</p>
                       </div>
+                      {call.dinodialCallId && (
+                        <div>
+                          <p className="text-neutral-500">Dinodial Call ID</p>
+                          <p className="text-neutral-300">{call.dinodialCallId}</p>
+                        </div>
+                      )}
                       {call.recordingUrl && (
                         <div className="col-span-2">
-                          <p className="text-neutral-500 mb-1">Recording</p>
-                          <a
-                            href={call.recordingUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-blue-400 hover:text-blue-300"
+                          <p className="text-neutral-500 mb-2 flex items-center gap-1">
+                            <Volume2 className="h-3.5 w-3.5" />
+                            Recording
+                          </p>
+                          <audio
+                            controls
+                            className="w-full h-10"
+                            src={call.recordingUrl}
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <ExternalLink className="h-3.5 w-3.5" />
-                            View Recording
-                          </a>
+                            Your browser does not support the audio element.
+                          </audio>
                         </div>
                       )}
                     </div>
@@ -675,6 +784,15 @@ function CallsTab({ calls, callsLoading, formatDate, getStatusBadgeClass }: Call
           </div>
         )}
       </div>
+
+      {/* Interview Details Modal */}
+      {detailsModalCall && (
+        <InterviewDetailsModal
+          call={detailsModalCall}
+          isOpen={!!detailsModalCall}
+          onClose={() => setDetailsModalCall(null)}
+        />
+      )}
     </div>
   );
 }

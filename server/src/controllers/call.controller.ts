@@ -4,6 +4,8 @@ import { Call } from '../models/call.model';
 import { Agent } from '../models/agent.model';
 import { Candidate } from '../models/candidate.model';
 import { AppError } from '../middleware/errorHandler';
+import { dinodialService } from '../services/dinodial.service';
+import { logger } from '../utils/logger';
 
 // @desc    Create a new call
 // @route   POST /api/calls
@@ -100,6 +102,44 @@ export const getCallsByAgent = async (req: Request, res: Response, next: NextFun
     const calls = await Call.find({ agentId })
       .populate('candidateId', 'name email phone')
       .sort({ scheduledTime: -1 });
+
+    // Sync status from Dinodial for in_progress calls
+    const statusMap: Record<string, 'scheduled' | 'in_progress' | 'completed' | 'failed'> = {
+      initiated: 'in_progress',
+      in_progress: 'in_progress',
+      completed: 'completed',
+      failed: 'failed',
+    };
+
+    for (const call of calls) {
+      if (call.status === 'in_progress' && call.dinodialCallId !== null) {
+        try {
+          const dinodialDetails = await dinodialService.getCallDetail(call.dinodialCallId);
+          const mappedStatus = statusMap[dinodialDetails.status] || call.status;
+          
+          if (call.status !== mappedStatus) {
+            call.status = mappedStatus;
+            
+            // Fetch recording URL when call completes
+            if (mappedStatus === 'completed') {
+              try {
+                const recordingUrl = await dinodialService.getRecordingUrl(call.dinodialCallId);
+                call.recordingUrl = recordingUrl;
+                logger.info(`Recording URL fetched for call ${call._id}`);
+              } catch (recordingErr) {
+                logger.error(`Failed to fetch recording URL for call ${call._id}`);
+              }
+            }
+            
+            await call.save();
+            logger.info(`Call ${call._id} status synced from Dinodial: ${mappedStatus}`);
+          }
+        } catch (err) {
+          logger.error(`Failed to sync status for call ${call._id} from Dinodial`);
+          // Continue with other calls, don't fail the whole request
+        }
+      }
+    }
 
     res.status(200).json({
       success: true,

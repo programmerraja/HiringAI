@@ -20,6 +20,10 @@ const config = {
   },
   logLevel: process.env.LOG_LEVEL || 'info',
   isDevelopment: process.env.NODE_ENV !== 'production',
+  dinodial: {
+    apiUrl: process.env.DINODIAL_API_URL || '',
+    adminToken: process.env.DINODIAL_ADMIN_TOKEN || '',
+  },
 };
 
 export default config;

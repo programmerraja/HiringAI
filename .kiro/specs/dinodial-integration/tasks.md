@@ -1,0 +1,102 @@
+# Implementation Plan
+
+- [x] 1. Backend Configuration and Types
+  - [x] 1.1 Add environment variables to server/.env
+    - Add DINODIAL_API_URL and DINODIAL_ADMIN_TOKEN
+    - _Requirements: 4.1_
+  - [x] 1.2 Create Dinodial TypeScript types
+    - Create `server/src/types/dinodial.types.ts` with all interfaces
+    - Include DinodialMakeCallRequest, DinodialCallResponse, DinodialCallDetail, EvaluationTool
+    - _Requirements: 7.2_
+  - [x] 1.3 Update Call model with dinodialCallId field
+    - Add `dinodialCallId: number | null` to ICall interface and schema
+    - Add 'failed' to status enum
+    - _Requirements: 8.1, 8.2_
+
+- [-] 2. Dinodial Service Layer
+  - [x] 2.1 Create DinodialService
+    - Create `server/src/services/dinodial.service.ts`
+    - Implement makeCall(), getCallDetail(), getRecordingUrl() methods
+    - Use axios with Bearer token authentication
+    - _Requirements: 7.1, 4.3_
+  - [ ]* 2.2 Write property test for authorization header
+    - **Property 5: Authorization Header Included**
+    - **Validates: Requirements 4.3**
+  - [ ]* 2.3 Write property test for error response security
+    - **Property 4: Error Responses Hide Internal Details**
+    - **Validates: Requirements 1.3, 4.2**
+
+- [x] 3. Prompt Builder Utilities
+  - [x] 3.1 Create PromptBuilder utility
+    - Create `server/src/utils/promptBuilder.ts`
+    - Implement buildXMLPrompt() to generate XML from agent config
+    - Include metadata, Persona, vocal_output_constraints, interview questions sections
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
+  - [x] 3.2 Create EvaluationToolBuilder utility
+    - Implement buildEvaluationTool() to generate JSON schema from pillars
+    - Map pillars to evaluation properties
+    - _Requirements: 5.6, 1.5_
+  - [ ]* 3.3 Write property test for XML prompt generation
+    - **Property 1: XML Prompt Contains All Agent Fields**
+    - **Validates: Requirements 1.4, 5.1, 5.2, 5.3, 5.4, 5.5**
+  - [ ]* 3.4 Write property test for evaluation tool mapping
+    - **Property 2: Evaluation Tool Maps Pillars to Properties**
+    - **Validates: Requirements 1.5, 5.6**
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 5. Interview Controller and Routes
+  - [x] 5.1 Create interview controller
+    - Create `server/src/controllers/interview.controller.ts`
+    - Implement initiateCall() - fetch call, candidate, agent, build prompt, call Dinodial, update Call record
+    - Implement getCallDetails() - fetch call with Dinodial details
+    - _Requirements: 1.1, 1.2, 3.1_
+  - [x] 5.2 Create interview routes
+    - Create `server/src/routes/interview.routes.ts`
+    - POST /api/calls/:id/initiate
+    - GET /api/calls/:id/details
+    - Register routes in main app
+    - _Requirements: 1.1, 3.1_
+  - [ ]* 5.3 Write property test for call record updates
+    - **Property 3: Successful Initiation Updates Call Record**
+    - **Validates: Requirements 1.2**
+  - [ ]* 5.4 Write property test for user filtering
+    - **Property 6: Interview List Filters by User's Agents**
+    - **Validates: Requirements 2.1**
+  - [ ]* 5.5 Write property test for status values
+    - **Property 9: Status Values Are Valid**
+    - **Validates: Requirements 6.3**
+
+- [ ] 6. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 7. Client API Integration
+  - [x] 7.1 Create interview API client
+    - Create `client/src/services/interview.api.ts`
+    - Implement initiateCall(callId) and getCallDetails(callId) methods
+    - _Requirements: 1.1, 3.1_
+  - [x] 7.2 Update call.api.ts types
+    - Add dinodialCallId to Call interface
+    - Add 'failed' to CallStatus type
+    - _Requirements: 8.1_
+
+- [x] 8. UI Components
+  - [x] 8.1 Add "Start Interview" button to AgentDetailPage
+    - Add button for scheduled calls without dinodialCallId
+    - Call initiateCall API on click
+    - Show loading state during API call
+    - Update call status on success
+    - _Requirements: 1.1_
+  - [x] 8.2 Add interview details view
+    - Create component to display call details with Dinodial data
+    - Show status, analysis/scorecard when available
+    - Add audio player for recording URL
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [x] 8.3 Implement polling for status updates
+    - Add polling mechanism (30 second interval) for in_progress calls
+    - Add manual refresh button
+    - _Requirements: 6.1, 6.4_
+
+- [ ] 9. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

@@ -1,6 +1,6 @@
 import api from "./api";
 
-export type CallStatus = "scheduled" | "in_progress" | "completed";
+export type CallStatus = "scheduled" | "in_progress" | "completed" | "failed";
 
 export interface Call {
   _id: string;
@@ -9,6 +9,7 @@ export interface Call {
   status: CallStatus;
   scheduledTime: string;
   recordingUrl?: string;
+  dinodialCallId: number | null;
   createdAt: string;
   updatedAt: string;
 }

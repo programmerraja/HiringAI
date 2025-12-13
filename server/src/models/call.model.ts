@@ -3,9 +3,10 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface ICall extends Document {
   candidateId: mongoose.Types.ObjectId;
   agentId: mongoose.Types.ObjectId;
-  status: 'scheduled' | 'in_progress' | 'completed';
+  status: 'scheduled' | 'in_progress' | 'completed' | 'failed';
   scheduledTime: Date;
   recordingUrl: string;
+  dinodialCallId: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,8 +26,8 @@ const callSchema = new Schema<ICall>(
     status: {
       type: String,
       enum: {
-        values: ['scheduled', 'in_progress', 'completed'],
-        message: 'Invalid status. Must be one of: scheduled, in_progress, completed',
+        values: ['scheduled', 'in_progress', 'completed', 'failed'],
+        message: 'Invalid status. Must be one of: scheduled, in_progress, completed, failed',
       },
       default: 'scheduled',
     },
@@ -37,6 +38,10 @@ const callSchema = new Schema<ICall>(
     recordingUrl: {
       type: String,
       default: '',
+    },
+    dinodialCallId: {
+      type: Number,
+      default: null,
     },
   },
   {
