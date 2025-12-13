@@ -17,6 +17,7 @@ export interface CreateCandidateData {
   email: string;
   phone?: string;
   resume?: string;
+  scheduledTime?: string;
 }
 
 export interface UpdateCandidateData {

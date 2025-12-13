@@ -4,21 +4,11 @@ import { ArrowLeft, Save, Settings, Users, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { agentApi, Agent } from "@/services/agent.api";
 import { candidateApi, Candidate } from "@/services/candidate.api";
+import { callApi, Call } from "@/services/call.api";
 import { QuestionGenerator } from "@/components/dashboard/QuestionGenerator";
-import { UserPlus, UserMinus,Calendar, Clock, ExternalLink } from "lucide-react";
+import { UserPlus, UserMinus, Calendar, Clock, ExternalLink } from "lucide-react";
 
 type TabType = "config" | "candidates" | "calls";
-
-interface Call {
-  _id: string;
-  candidateId: { _id: string; name: string; email: string; phone: string } | string;
-  agentId: string;
-  status: "scheduled" | "in_progress" | "completed";
-  scheduledTime: string;
-  recordingUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 const pillarLabels: Record<string, string> = {
   experience: "Experience",
@@ -113,13 +103,8 @@ export function AgentDetailPage() {
   const fetchCalls = async () => {
     try {
       setCallsLoading(true);
-      const response = await fetch(`/api/calls/agent/${id}`, {
-        credentials: "include",
-      });
-      const data = await response.json();
-      if (data.success) {
-        setCalls(data.data);
-      }
+      const data = await callApi.getByAgent(id!);
+      setCalls(data);
     } catch (err) {
       console.error("Failed to fetch calls:", err);
     } finally {

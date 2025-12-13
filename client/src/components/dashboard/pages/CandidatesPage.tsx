@@ -233,6 +233,7 @@ function AddCandidateForm({
     email: "",
     phone: "",
     resume: "",
+    scheduledTime: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -244,6 +245,11 @@ function AddCandidateForm({
       return;
     }
 
+    if (formData.agentId && !formData.scheduledTime) {
+      setError("Scheduled time is required when assigning to an agent");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError(null);
@@ -252,7 +258,7 @@ function AddCandidateForm({
         email: formData.email,
         phone: formData.phone,
         resume: formData.resume,
-        ...(formData.agentId && { agentId: formData.agentId }),
+        ...(formData.agentId && { agentId: formData.agentId, scheduledTime: formData.scheduledTime }),
       };
       const candidate = await candidateApi.create(createData);
       onCreated(candidate);
@@ -294,7 +300,7 @@ function AddCandidateForm({
             <label className="block text-sm text-neutral-300 mb-1">Agent (optional)</label>
             <select
               value={formData.agentId}
-              onChange={(e) => setFormData({ ...formData, agentId: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, agentId: e.target.value, scheduledTime: e.target.value ? formData.scheduledTime : "" })}
               className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-neutral-600"
             >
               <option value="">Unassigned</option>
@@ -306,6 +312,18 @@ function AddCandidateForm({
             </select>
           </div>
         </div>
+
+        {formData.agentId && (
+          <div>
+            <label className="block text-sm text-neutral-300 mb-1">Scheduled Interview Time</label>
+            <input
+              type="datetime-local"
+              value={formData.scheduledTime}
+              onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
+              className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-neutral-600"
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div>

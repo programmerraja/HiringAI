@@ -30,7 +30,7 @@ export const getCandidates = async (req: Request, res: Response, next: NextFunct
         error.statusCode = 404;
         return next(error);
       }
-      query.$or = undefined;
+      delete query.$or;
       query.agentId = agentId;
     }
 
@@ -96,9 +96,9 @@ export const getCandidate = async (req: Request, res: Response, next: NextFuncti
 // @access  Private
 export const createCandidate = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { agentId, name, email, phone, resume } = req.body;
+    const { agentId, name, email, phone, resume, scheduledTime } = req.body;
 
-    // If agentId is provided, verify agent belongs to user
+    // If agentId is provided, verify agent belongs to user and scheduledTime is required
     if (agentId) {
       const agent = await Agent.findOne({
         _id: agentId,
@@ -108,6 +108,12 @@ export const createCandidate = async (req: Request, res: Response, next: NextFun
       if (!agent) {
         const error: AppError = new Error('Agent not found');
         error.statusCode = 404;
+        return next(error);
+      }
+
+      if (!scheduledTime) {
+        const error: AppError = new Error('Scheduled time is required when assigning to an agent');
+        error.statusCode = 400;
         return next(error);
       }
     }
@@ -120,9 +126,21 @@ export const createCandidate = async (req: Request, res: Response, next: NextFun
       resume: resume || '',
     });
 
+    // If agentId is provided, create a Call record
+    let call = null;
+    if (agentId && scheduledTime) {
+      call = await Call.create({
+        candidateId: candidate._id,
+        agentId: agentId,
+        status: 'scheduled',
+        scheduledTime: new Date(scheduledTime),
+      });
+    }
+
     res.status(201).json({
       success: true,
       data: candidate,
+      call,
     });
   } catch (error) {
     next(error);
