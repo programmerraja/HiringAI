@@ -1,12 +1,11 @@
-import { createOpenAI } from '@ai-sdk/openai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { logger } from '../utils/logger';
 
-// Initialize OpenAI with Azure endpoint
-const openai = createOpenAI({
-  baseURL: 'https://models.inference.ai.azure.com',
-  apiKey: process.env.OPENAI_API_KEY || '',
+// Initialize Google Gemini
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GOOGLE_API_KEY || '',
 });
 
 export type Pillar = 'experience' | 'behavioral' | 'role_specific' | 'cultural_fit';
@@ -32,8 +31,8 @@ export const generateQuestions = async (
 ): Promise<GenerateQuestionsResult> => {
   const { pillar, prompt, jobTitle, jobDescription } = params;
 
-  if (!process.env.OPENAI_API_KEY) {
-    logger.warn('OPENAI_API_KEY not set, returning empty questions');
+  if (!process.env.GOOGLE_API_KEY) {
+    logger.warn('GOOGLE_API_KEY not set, returning empty questions');
     return { questions: [] };
   }
 
@@ -51,7 +50,7 @@ Please generate 5 relevant interview questions based on the above context. The q
 - Relevant to the job role`;
 
     const response = await generateObject({
-      model: openai('gpt-4o'),
+      model: google('gemini-1.5-flash'),
       schemaName: 'interviewQuestions',
       schemaDescription: 'Generated interview questions for a specific pillar',
       schema: z.object({
