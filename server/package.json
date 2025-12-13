@@ -22,6 +22,9 @@
   "author": "K.boopathi",
   "license": "ISC",
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.86",
+    "ai": "^5.0.113",
+    "axios": "^1.13.2",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
@@ -33,7 +36,8 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.1.0",
     "morgan": "^1.10.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",

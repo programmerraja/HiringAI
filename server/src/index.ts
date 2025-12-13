@@ -12,6 +12,9 @@ import { errorHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
+import companyRoutes from './routes/company.routes';
+import agentRoutes from './routes/agent.routes';
+import candidateRoutes from './routes/candidate.routes';
 
 dotenv.config();
 
@@ -22,11 +25,17 @@ connectDB();
 
 app.use(
   cors({
-    origin: config.isDevelopment ? 'http://localhost:5173' : process.env.CLIENT_URL,
+    origin: ['http://localhost:5173', 'http://localhost:5174'], // Vite dev server ports
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   }),
 );
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }),
+);
 app.use(compression());
 app.use(morgan('dev'));
 app.use(cookieParser(config.cookie.secret));
@@ -35,6 +44,9 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/companies', companyRoutes);
+app.use('/api/agents', agentRoutes);
+app.use('/api/candidates', candidateRoutes);
 
 app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });

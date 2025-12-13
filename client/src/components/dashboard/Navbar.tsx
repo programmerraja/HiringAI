@@ -1,6 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Bot } from "lucide-react";
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -12,24 +13,25 @@ export function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-md border-b border-gray-200">
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center">
-          <h1 className="text-xl font-bold text-blue-600">hiringai</h1>
+    <nav className="bg-black border-b border-neutral-800">
+      <div className="px-6 py-4 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <Bot className="h-6 w-6 text-white" />
+          <span className="text-white font-bold text-xl">HiringAI</span>
         </div>
 
         <div className="flex items-center gap-6">
           {user && (
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-neutral-400">
               Welcome,{" "}
-              <span className="font-medium text-gray-800">{user.name}</span>
+              <span className="font-medium text-white">{user.name}</span>
             </div>
           )}
           <Button
             onClick={handleLogout}
             variant="outline"
             size="sm"
-            className="border-gray-300 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+            className="border-neutral-700 bg-transparent text-white hover:bg-neutral-800 hover:text-white transition-colors"
           >
             Logout
           </Button>
