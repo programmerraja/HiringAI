@@ -53,12 +53,12 @@ class DinodialService {
 
       logger.info(`Dinodial call initiated successfully, id: ${response.data.data.id}`);
       return response.data;
-    } catch (error) {
-      // if (error.response?.data?.status_code === 429) {
-      //   throw new Error("Too many requests try again");
-      // }
+    } catch (error: any) {
+      if (error.response?.status === 429) {
+        throw new Error(error.response?.data);
+      }
       this.handleError(error, 'makeCall');
-      throw error; // Re-throw after logging
+      throw error;
     }
   }
 

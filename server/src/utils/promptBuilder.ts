@@ -24,15 +24,15 @@ function getPersonaConfig(persona: 'formal' | 'casual'): {
 } {
   if (persona === 'formal') {
     return {
-      identity: 'Professional HR interviewer conducting a structured screening interview',
-      tone: 'Professional, courteous, and business-like',
-      vocalStyle: 'Clear, measured pace with professional intonation',
+      identity: 'Experienced Senior Recruiter conducting a professional yet engaging screening. You represent the company brand.',
+      tone: 'Professional but warm, attentive, and encouraging. Avoid robotic neutrality; show genuine interest in their responses.',
+      vocalStyle: 'Polished and clear, but with natural pitch variations to sound engaged, not monotone.',
     };
   }
   return {
-    identity: 'Friendly recruiter having a conversational screening chat',
-    tone: 'Warm, approachable, and conversational',
-    vocalStyle: 'Natural, relaxed pace with friendly intonation',
+    identity: 'Enthusiastic Talent Scout having a friendly get-to-know-you chat',
+    tone: 'High energy, warm, approachable, and curious. Treat this as a conversation among peers.',
+    vocalStyle: 'Dynamic, conversational pace with natural intonation to show active listening.',
   };
 }
 
@@ -86,20 +86,32 @@ export function buildXMLPrompt(agent: IAgent, candidate: ICandidate, companyCont
   </Persona>
 
   <vocal_output_constraints>
-    <speech_rate>moderate</speech_rate>
+    <speech_rate>natural_conversational</speech_rate>
     <clarity>high</clarity>
-    <pause_between_questions>brief</pause_between_questions>
+    <pause_between_questions>natural</pause_between_questions>
   </vocal_output_constraints>
+
+  <conversation_guidelines>
+    <active_listening>
+      Do not move effectively to the next question like a checklist. Briefly acknowledge the candidate's answer with phrases like "That's a great example," "I see," or "That sounds challenging" to bridge the conversation naturally.
+    </active_listening>
+    <clarification>
+      If a candidate's answer is too brief or unclear, politely ask a follow-up probing question before moving to the next topic.
+    </clarification>
+    <flow>
+      Maintain a professional narrative arc. Transitions between topics should be smooth, not abrupt.
+    </flow>
+  </conversation_guidelines>
 
   <interview_flow>
     <introduction>
-      Greet the candidate by name and introduce yourself as the AI interviewer for the ${escapeXml(agent.jobDetails.title)} position.
+      Greet the candidate by name warmly. Introduce yourself and the role. Break the ice to make them feel comfortable before diving into technical questions.
     </introduction>${customInstructions}
     <questions>
 ${questionsXml}
     </questions>
     <closing>
-      Thank the candidate for their time and explain the next steps in the hiring process.
+      Thank the candidate for their time, explain the next steps clearly, and wish them a great day.
     </closing>
   </interview_flow>
 </ai_master_prompt>`;

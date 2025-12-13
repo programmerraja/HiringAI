@@ -108,14 +108,14 @@ export const initiateCall = async (req: Request, res: Response, next: NextFuncti
           status: call.status,
         },
       });
-    } catch (dinodialError) {
+    } catch (dinodialError: any) {
       // Update call status to failed
       call.status = 'failed';
       await call.save();
 
       logger.error(`Failed to initiate interview for call ${id}`);
 
-      const error: AppError = new Error('External service unavailable');
+      const error: AppError = new Error(dinodialError.message || 'External service unavailable');
       error.statusCode = 503;
       return next(error);
     }

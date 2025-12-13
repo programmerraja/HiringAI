@@ -313,7 +313,7 @@ function OverallRecommendationCard({ recommendation, summary }: OverallRecommend
     strongly_recommend: {
       color: 'bg-gradient-to-br from-green-600 to-green-700',
       textColor: 'text-white',
-      icon: '✅',
+      icon: '',
       label: 'STRONG HIRE',
       description: 'Excellent candidate - proceed immediately'
     },
@@ -351,7 +351,6 @@ function OverallRecommendationCard({ recommendation, summary }: OverallRecommend
 
   return (
     <div className={`${config.color} ${config.textColor} rounded-xl p-4 text-center shadow-lg animate-fadeIn`}>
-      <p className="text-xs opacity-80 font-medium tracking-wider mb-2">HIRING RECOMMENDATION</p>
 
       <div className="flex items-center justify-center gap-3 mb-2">
         <div className="text-4xl">{config.icon}</div>
@@ -438,7 +437,7 @@ function PillarScoresGrid({ analysis }: { analysis: Record<string, unknown> }) {
 
             {/* Short notes preview (if available) */}
             {notes && (
-              <p className="text-neutral-400 text-sm line-clamp-2 leading-relaxed">
+              <p className="text-neutral-400 text-sm leading-relaxed">
                 {notes}
               </p>
             )}
