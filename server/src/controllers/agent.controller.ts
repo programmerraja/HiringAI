@@ -201,47 +201,47 @@ export const generateAgentQuestions = async (req: Request, res: Response, next: 
     return Promise.reject("HACKTHON IS OVER SO NO MORE DEMO")
 
 
-    // Validate pillar
-    const validPillars: Pillar[] = ['experience', 'behavioral', 'role_specific', 'cultural_fit'];
-    if (!pillar || !validPillars.includes(pillar)) {
-      const error: AppError = new Error(
-        'Invalid pillar. Must be one of: experience, behavioral, role_specific, cultural_fit'
-      );
-      error.statusCode = 400;
-      return next(error);
-    }
+    // // Validate pillar
+    // const validPillars: Pillar[] = ['experience', 'behavioral', 'role_specific', 'cultural_fit'];
+    // if (!pillar || !validPillars.includes(pillar)) {
+    //   const error: AppError = new Error(
+    //     'Invalid pillar. Must be one of: experience, behavioral, role_specific, cultural_fit'
+    //   );
+    //   error.statusCode = 400;
+    //   return next(error);
+    // }
 
-    // Validate prompt
-    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
-      const error: AppError = new Error('Prompt is required');
-      error.statusCode = 400;
-      return next(error);
-    }
+    // // Validate prompt
+    // if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+    //   const error: AppError = new Error('Prompt is required');
+    //   error.statusCode = 400;
+    //   return next(error);
+    // }
 
-    // Get agent to retrieve job details
-    const agent = await Agent.findOne({
-      _id: req.params.id,
-      userId: req.user.id,
-    });
+    // // Get agent to retrieve job details
+    // const agent = await Agent.findOne({
+    //   _id: req.params.id,
+    //   userId: req.user.id,
+    // });
 
-    if (!agent) {
-      const error: AppError = new Error('Agent not found');
-      error.statusCode = 404;
-      return next(error);
-    }
+    // if (!agent) {
+    //   const error: AppError = new Error('Agent not found');
+    //   error.statusCode = 404;
+    //   return next(error);
+    // }
 
-    // Generate questions using AI service
-    const result = await generateQuestions({
-      pillar,
-      prompt: prompt.trim(),
-      jobTitle: agent.jobDetails.title,
-      jobDescription: agent.jobDetails.description,
-    });
+    // // Generate questions using AI service
+    // const result = await generateQuestions({
+    //   pillar,
+    //   prompt: prompt.trim(),
+    //   jobTitle: agent.jobDetails.title,
+    //   jobDescription: agent.jobDetails.description,
+    // });
 
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
+    // res.status(200).json({
+    //   success: true,
+    //   data: result,
+    // });
   } catch (error) {
     next(error);
   }
