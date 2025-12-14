@@ -5,6 +5,7 @@ import {
   getCallsByCandidate,
   updateCall,
   updateCallStatus,
+  proxyMedia,
 } from '../controllers/call.controller';
 import { initiateCall, getCallDetails } from '../controllers/interview.controller';
 import { protect } from '../middleware/auth';
@@ -22,6 +23,10 @@ router.route('/agent/:agentId').get(getCallsByAgent);
 
 // GET /api/calls/candidate/:candidateId - Get all calls for a candidate
 router.route('/candidate/:candidateId').get(getCallsByCandidate);
+
+// GET /api/calls/proxy-media - Proxy media content
+// NOTE: This must be defined BEFORE /:id routes
+router.route('/proxy-media').get(proxyMedia);
 
 // PATCH /api/calls/:id - Update call details
 // PATCH /api/calls/:id/status - Update call status

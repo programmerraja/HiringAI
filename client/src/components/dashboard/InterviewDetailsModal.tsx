@@ -254,8 +254,13 @@ function AudioPlayerSection({ recordingUrl }: AudioPlayerSectionProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
 
+  // Use proxy for external URLs to avoid CSP issues
+  const proxiedUrl = recordingUrl.startsWith('http')
+    ? `/api/calls/proxy-media?url=${encodeURIComponent(recordingUrl)}`
+    : recordingUrl;
+
   useEffect(() => {
-    const audio = new Audio(recordingUrl);
+    const audio = new Audio(proxiedUrl);
     audio.addEventListener("ended", () => setIsPlaying(false));
     setAudioElement(audio);
 
@@ -263,7 +268,7 @@ function AudioPlayerSection({ recordingUrl }: AudioPlayerSectionProps) {
       audio.pause();
       audio.removeEventListener("ended", () => setIsPlaying(false));
     };
-  }, [recordingUrl]);
+  }, [proxiedUrl]);
 
   const togglePlay = () => {
     if (!audioElement) return;
@@ -294,7 +299,7 @@ function AudioPlayerSection({ recordingUrl }: AudioPlayerSectionProps) {
           )}
         </button>
         <div className="flex-1">
-          <audio controls className="w-full h-8" src={recordingUrl}>
+          <audio controls className="w-full h-8" src={proxiedUrl}>
             Your browser does not support the audio element.
           </audio>
         </div>

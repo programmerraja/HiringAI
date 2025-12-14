@@ -6,6 +6,41 @@ import { Candidate } from '../models/candidate.model';
 import { AppError } from '../middleware/errorHandler';
 import { dinodialService } from '../services/dinodial.service';
 import { logger } from '../utils/logger';
+import axios from 'axios';
+
+// @desc    Proxy media content
+// @route   GET /api/calls/proxy-media
+// @access  Private
+export const proxyMedia = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { url } = req.query;
+
+    if (!url || typeof url !== 'string') {
+      const error: AppError = new Error('Missing or invalid URL parameter');
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    const response = await axios({
+      method: 'get',
+      url: url,
+      responseType: 'stream',
+    });
+
+    // Set appropriate headers
+    if (response.headers['content-type']) {
+      res.setHeader('Content-Type', response.headers['content-type']);
+    }
+    if (response.headers['content-length']) {
+      res.setHeader('Content-Length', response.headers['content-length']);
+    }
+
+    response.data.pipe(res);
+  } catch (error) {
+    logger.error('Proxy media error:', error);
+    next(error);
+  }
+};
 
 // @desc    Create a new call
 // @route   POST /api/calls
