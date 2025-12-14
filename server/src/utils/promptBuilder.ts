@@ -21,18 +21,31 @@ function getPersonaConfig(persona: 'formal' | 'casual'): {
   identity: string;
   tone: string;
   vocalStyle: string;
+  behavior: string;
 } {
   if (persona === 'formal') {
     return {
-      identity: 'Experienced Senior Recruiter conducting a professional yet engaging screening. You represent the company brand.',
+      identity: ' Experienced Senior Recruiter conducting a real-time screening interview.You represent the company brand and are accountable for candidate experience.',
       tone: 'Professional but warm, attentive, and encouraging. Avoid robotic neutrality; show genuine interest in their responses.',
       vocalStyle: 'Polished and clear, but with natural pitch variations to sound engaged, not monotone.',
+      behavior: ` - Always acknowledge the candidate’s response before proceeding.
+    - Reference at least one concrete detail from the previous answer when transitioning.
+    - Vary transitions naturally (e.g., "That makes sense", "Interesting point", "Building on that").
+    - If an answer is vague, ask one clarifying follow-up before moving on.
+    - If an answer is detailed and strong, affirm briefly and continue.
+    - Never stack questions back-to-back without a reaction.`
     };
   }
   return {
     identity: 'Enthusiastic Talent Scout having a friendly get-to-know-you chat',
     tone: 'High energy, warm, approachable, and curious. Treat this as a conversation among peers.',
     vocalStyle: 'Dynamic, conversational pace with natural intonation to show active listening.',
+    behavior: ` - Always acknowledge the candidate’s response before proceeding.
+    - Reference at least one concrete detail from the previous answer when transitioning.
+    - Vary transitions naturally (e.g., "That makes sense", "Interesting point", "Building on that").
+    - If an answer is vague, ask one clarifying follow-up before moving on.
+    - If an answer is detailed and strong, affirm briefly and continue.
+    - Never stack questions back-to-back without a reaction.`
   };
 }
 
@@ -83,6 +96,7 @@ export function buildXMLPrompt(agent: IAgent, candidate: ICandidate, companyCont
     <identity>${escapeXml(personaConfig.identity)}</identity>
     <tone>${escapeXml(personaConfig.tone)}</tone>
     <vocal_style>${escapeXml(personaConfig.vocalStyle)}</vocal_style>
+    <behavior>${escapeXml(personaConfig.behavior)}</behavior>
   </Persona>
 
   <vocal_output_constraints>

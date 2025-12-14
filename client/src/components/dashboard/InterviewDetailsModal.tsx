@@ -15,7 +15,7 @@ export function InterviewDetailsModal({ call, isOpen, onClose }: InterviewDetail
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [details, setDetails] = useState<CallDetailsResponse["data"] | null>(null);
-
+  console.log("call", call);
   const fetchDetails = async () => {
     setLoading(true);
     setError(null);
