@@ -352,11 +352,10 @@ function OverallRecommendationCard({ recommendation, summary }: OverallRecommend
   return (
     <div className={`${config.color} ${config.textColor} rounded-xl p-4 text-center shadow-lg animate-fadeIn`}>
 
-      <div className="flex items-center justify-center gap-3 mb-2">
-        <div className="text-4xl">{config.icon}</div>
+      <div className="flex items-center mb-2">
         <div className="text-left">
           <h3 className="text-2xl font-bold leading-none">{config.label}</h3>
-          <p className="text-sm opacity-90 leading-tight mt-1">{config.description}</p>e
+          <p className="text-sm opacity-90 leading-tight mt-1">{config.description}</p>
         </div>
       </div>
 
