@@ -17,6 +17,7 @@ import { logger } from '../utils/logger';
  */
 export const initiateCall = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    return Promise.reject("HACKTHON IS OVER SO NO MORE DEMO")
     const { id } = req.params;
 
     // Validate call ID format
