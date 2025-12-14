@@ -133,3 +133,6 @@ The AI fills out this exact structure for every candidate:
   }
 }
 ```
+
+## Live Demo
+Deployed at: https://hiringai.vercel.app/

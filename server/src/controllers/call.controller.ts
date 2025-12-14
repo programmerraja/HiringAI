@@ -128,6 +128,12 @@ export const getCallsByAgent = async (req: Request, res: Response, next: NextFun
               } catch (recordingErr) {
                 logger.error(`Failed to fetch recording URL for call ${call._id}`);
               }
+
+              // Update analysis from Dinodial details
+              if (dinodialDetails.call_details?.callOutcomesData) {
+                call.analysis = dinodialDetails.call_details.callOutcomesData;
+                logger.info(`Analysis updated for call ${call._id}`);
+              }
             }
 
             await call.save();

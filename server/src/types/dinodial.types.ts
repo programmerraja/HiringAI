@@ -62,6 +62,10 @@ export interface DinodialCallDetail {
   recording_url?: string;
   duration?: number;
   created_at: string;
+  call_details?: {
+    callOutcomesData?: Record<string, any>;
+    [key: string]: any;
+  };
 }
 
 /**

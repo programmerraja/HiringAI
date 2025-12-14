@@ -320,28 +320,28 @@ function OverallRecommendationCard({ recommendation, summary }: OverallRecommend
     recommend: {
       color: 'bg-gradient-to-br from-green-700 to-green-800',
       textColor: 'text-white',
-      icon: '👍',
+      icon: '',
       label: 'HIRE',
       description: 'Good candidate - recommend for next round'
     },
     neutral: {
       color: 'bg-gradient-to-br from-yellow-600 to-yellow-700',
       textColor: 'text-white',
-      icon: '⚖️',
+      icon: '',
       label: 'MAYBE',
       description: 'Mixed results - review carefully'
     },
     not_recommend: {
       color: 'bg-gradient-to-br from-orange-600 to-orange-700',
       textColor: 'text-white',
-      icon: '❌',
+      icon: '',
       label: 'PASS',
       description: 'Does not meet requirements'
     },
     strongly_not_recommend: {
       color: 'bg-gradient-to-br from-red-600 to-red-700',
       textColor: 'text-white',
-      icon: '🚫',
+      icon: '',
       label: 'STRONG PASS',
       description: 'Not a fit - do not proceed'
     }
@@ -356,7 +356,7 @@ function OverallRecommendationCard({ recommendation, summary }: OverallRecommend
         <div className="text-4xl">{config.icon}</div>
         <div className="text-left">
           <h3 className="text-2xl font-bold leading-none">{config.label}</h3>
-          <p className="text-sm opacity-90 leading-tight mt-1">{config.description}</p>
+          <p className="text-sm opacity-90 leading-tight mt-1">{config.description}</p>e
         </div>
       </div>
 
