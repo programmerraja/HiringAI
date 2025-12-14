@@ -161,10 +161,10 @@ export function AgentsPage() {
             <div
               key={agent._id}
               className="bg-neutral-900 rounded-lg border border-neutral-800 p-5 hover:border-neutral-700 transition-colors cursor-pointer"
-              onClick={() => navigate(`/dashboard/agents/${agent._id}`)}
+
             >
               <div className="flex items-start justify-between">
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-4" onClick={() => navigate(`/dashboard/agents/${agent._id}`)}>
                   <div className="h-12 w-12 bg-neutral-800 rounded-lg flex items-center justify-center">
                     <Bot className="h-6 w-6 text-neutral-400" />
                   </div>
