@@ -160,7 +160,8 @@ export function AgentsPage() {
           {agents.map((agent) => (
             <div
               key={agent._id}
-              className="bg-neutral-900 rounded-lg border border-neutral-800 p-5 hover:border-neutral-700 transition-colors"
+              className="bg-neutral-900 rounded-lg border border-neutral-800 p-5 hover:border-neutral-700 transition-colors cursor-pointer"
+              onClick={() => navigate(`/dashboard/agents/${agent._id}`)}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4">
@@ -168,10 +169,10 @@ export function AgentsPage() {
                     <Bot className="h-6 w-6 text-neutral-400" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3" >
                       <h3
-                        className="text-white font-semibold cursor-pointer hover:text-neutral-300"
-                        onClick={() => navigate(`/dashboard/agents/${agent._id}`)}
+                        className="text-white font-semibold  hover:text-neutral-300"
+
                       >
                         {agent.name}
                       </h3>
