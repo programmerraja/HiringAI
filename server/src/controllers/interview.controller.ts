@@ -18,108 +18,108 @@ import { logger } from '../utils/logger';
 export const initiateCall = async (req: Request, res: Response, next: NextFunction) => {
   try {
     return Promise.reject("HACKTHON IS OVER SO NO MORE DEMO")
-    const { id } = req.params;
+    // const { id } = req.params;
 
-    // Validate call ID format
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      const error: AppError = new Error('Invalid call ID format');
-      error.statusCode = 400;
-      return next(error);
-    }
+    // // Validate call ID format
+    // if (!mongoose.Types.ObjectId.isValid(id)) {
+    //   const error: AppError = new Error('Invalid call ID format');
+    //   error.statusCode = 400;
+    //   return next(error);
+    // }
 
-    // Fetch the call
-    const call = await Call.findById(id);
-    if (!call) {
-      const error: AppError = new Error('Call not found');
-      error.statusCode = 404;
-      return next(error);
-    }
+    // // Fetch the call
+    // const call = await Call.findById(id);
+    // if (!call) {
+    //   const error: AppError = new Error('Call not found');
+    //   error.statusCode = 404;
+    //   return next(error);
+    // }
 
-    // Check if call already initiated
-    if (call.dinodialCallId !== null) {
-      const error: AppError = new Error('Interview already initiated');
-      error.statusCode = 409;
-      return next(error);
-    }
+    // // Check if call already initiated
+    // if (call.dinodialCallId !== null) {
+    //   const error: AppError = new Error('Interview already initiated');
+    //   error.statusCode = 409;
+    //   return next(error);
+    // }
 
-    // Verify agent exists and belongs to user
-    const agent = await Agent.findOne({
-      _id: call.agentId,
-      userId: req.user.id,
-    });
+    // // Verify agent exists and belongs to user
+    // const agent = await Agent.findOne({
+    //   _id: call.agentId,
+    //   userId: req.user.id,
+    // });
 
-    if (!agent) {
-      const error: AppError = new Error('Agent not found');
-      error.statusCode = 404;
-      return next(error);
-    }
+    // if (!agent) {
+    //   const error: AppError = new Error('Agent not found');
+    //   error.statusCode = 404;
+    //   return next(error);
+    // }
 
-    // Check if agent is active
-    if (agent.status !== 'active') {
-      const error: AppError = new Error('Agent must be active to initiate calls');
-      error.statusCode = 400;
-      return next(error);
-    }
+    // // Check if agent is active
+    // if (agent.status !== 'active') {
+    //   const error: AppError = new Error('Agent must be active to initiate calls');
+    //   error.statusCode = 400;
+    //   return next(error);
+    // }
 
 
-    // Fetch the candidate
-    const candidate = await Candidate.findById(call.candidateId);
-    if (!candidate) {
-      const error: AppError = new Error('Candidate not found');
-      error.statusCode = 404;
-      return next(error);
-    }
+    // // Fetch the candidate
+    // const candidate = await Candidate.findById(call.candidateId);
+    // if (!candidate) {
+    //   const error: AppError = new Error('Candidate not found');
+    //   error.statusCode = 404;
+    //   return next(error);
+    // }
 
-    // Validate candidate has phone number
-    if (!candidate.phone || candidate.phone.trim() === '') {
-      const error: AppError = new Error('Candidate phone number required');
-      error.statusCode = 400;
-      return next(error);
-    }
+    // // Validate candidate has phone number
+    // if (!candidate.phone || candidate.phone.trim() === '') {
+    //   const error: AppError = new Error('Candidate phone number required');
+    //   error.statusCode = 400;
+    //   return next(error);
+    // }
 
-    // Fetch company context
-    const company = await Company.findById(agent.companyId);
-    const companyContext = company?.context;
+    // // Fetch company context
+    // const company = await Company.findById(agent.companyId);
+    // const companyContext = company?.context;
 
-    // Build the XML prompt and evaluation tool
-    const prompt = buildXMLPrompt(agent, candidate, companyContext);
-    const evaluationTool = buildEvaluationTool(agent.pillars);
+    // // Build the XML prompt and evaluation tool
+    // const prompt = buildXMLPrompt(agent, candidate, companyContext);
+    // const evaluationTool = buildEvaluationTool(agent.pillars);
 
-    try {
-      // Call Dinodial API
-      const dinodialResponse = await dinodialService.makeCall(
-        candidate.phone,
-        prompt,
-        evaluationTool
-      );
+    // try {
+    //   // Call Dinodial API
+    //   const dinodialResponse = await dinodialService.makeCall(
+    //     candidate.phone,
+    //     prompt,
+    //     evaluationTool
+    //   );
 
-      // Update call record with Dinodial ID and status
-      call.dinodialCallId = dinodialResponse.data.id;
-      call.status = 'in_progress';
-      call.prompt = prompt;
-      await call.save();
+    //   // Update call record with Dinodial ID and status
+    //   call.dinodialCallId = dinodialResponse.data.id;
+    //   call.status = 'in_progress';
+    //   call.prompt = prompt;
+    //   await call.save();
 
-      logger.info(`Interview initiated for call ${id}, dinodialCallId: ${dinodialResponse.data.id}`);
+    //   logger.info(`Interview initiated for call ${id}, dinodialCallId: ${dinodialResponse.data.id}`);
 
-      res.status(200).json({
-        success: true,
-        data: {
-          callId: call._id,
-          dinodialCallId: dinodialResponse.data.id,
-          status: call.status,
-        },
-      });
-    } catch (dinodialError: any) {
-      // Update call status to failed
-      call.status = 'failed';
-      await call.save();
+    //   res.status(200).json({
+    //     success: true,
+    //     data: {
+    //       callId: call._id,
+    //       dinodialCallId: dinodialResponse.data.id,
+    //       status: call.status,
+    //     },
+    //   });
+    // } catch (dinodialError: any) {
+    //   // Update call status to failed
+    //   call.status = 'failed';
+    //   await call.save();
 
-      logger.error(`Failed to initiate interview for call ${id}`);
+    //   logger.error(`Failed to initiate interview for call ${id}`);
 
-      const error: AppError = new Error(dinodialError.message || 'External service unavailable');
-      error.statusCode = 503;
-      return next(error);
-    }
+    //   const error: AppError = new Error(dinodialError.message || 'External service unavailable');
+    //   error.statusCode = 503;
+    //   return next(error);
+    // }
   } catch (error) {
     next(error);
   }
