@@ -72,6 +72,24 @@ export function generatePreviewPrompt(agent: AgentData, companyContext?: string)
     <job_title>${escapeXml(agent.jobDetails.title)}</job_title>
     <job_description>${escapeXml(agent.jobDetails.description)}</job_description>
     <candidate_name>${escapeXml(candidate.name)}</candidate_name>
+    <candidate_resume>
+      <skills>Python, React, Node.js, TypeScript, AWS</skills>
+      <experience>
+        <job>
+          <role>Senior Developer</role>
+          <company>Tech Corp</company>
+          <duration>2020 - Present</duration>
+          <description>Led development of core platform features.</description>
+        </job>
+      </experience>
+      <education>
+        <school>
+          <degree>BS Computer Science</degree>
+          <institution>University of Tech</institution>
+          <field>Computer Science</field>
+        </school>
+      </education>
+    </candidate_resume>
   </metadata>${companyContextXml}
 
   <Persona>

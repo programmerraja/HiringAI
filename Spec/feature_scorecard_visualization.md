@@ -20,13 +20,13 @@ function OverallRecommendationCard({ recommendation, summary }) {
   const configs = {
     strongly_recommend: {
       bg: 'bg-gradient-to-br from-green-600 to-green-700',
-      icon: '✅',
+      icon: '',
       label: 'STRONG HIRE'
     },
-    recommend: { bg: 'bg-green-700', icon: '👍', label: 'HIRE' },
-    neutral: { bg: 'bg-yellow-600', icon: '⚖️', label: 'MAYBE' },
-    not_recommend: { bg: 'bg-orange-600', icon: '❌', label: 'PASS' },
-    strongly_not_recommend: { bg: 'bg-red-600', icon: '🚫', label: 'STRONG PASS' }
+    recommend: { bg: 'bg-green-700', icon: '', label: 'HIRE' },
+    neutral: { bg: 'bg-yellow-600', icon: '', label: 'MAYBE' },
+    not_recommend: { bg: 'bg-orange-600', icon: '', label: 'PASS' },
+    strongly_not_recommend: { bg: 'bg-red-600', icon: '', label: 'STRONG PASS' }
   };
 
   const config = configs[recommendation] || configs.neutral;

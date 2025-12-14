@@ -37,7 +37,7 @@ We assemble the prompt in real-time (`server/src/utils/promptBuilder.ts`) using 
 ```mermaid
 graph TD
     A[Agent Configuration] -->|Job Details, Persona, Pillars| B(Prompt Builder)
-    C[Candidate Data] -->|Name, Resume| B
+    C[Candidate Data] -->|Name, Parsed Resume| B
     D[Company Context] -->|Values, Mission| B
     
     B --> E{XML Master Prompt}
@@ -60,6 +60,36 @@ graph TD
     <job_title>AI Engineer</job_title>
     <job_description>## About the Role\nWe are seeking a talented AI Engineer to help build the next generation of Dinodial&apos;s &apos;AI Telephony stack&apos;. In this role, you will be responsible for designing and implementing low-latency, high-precision conversational AI systems that power our voice automation solutions. You will work closely with our product and engineering teams to deploy scalable AI Co-Pilots and Trainers.\n\n## Key Responsibilities\n- Design and optimize LLM-based conversational flows for real-time voice interactions.\n- Implement and fine-tune RAG (Retrieval-Augmented Generation) pipelines to ensure agents have access to accurate, context-aware information.\n- Optimize system latency to achieve sub-second response times for a natural &apos;human-like&apos; feel.\n- Develop robust function-calling capabilities to enable agents to perform actions (booking, data retrieval) during calls.\n- Ensure all AI solutions adhere to strict security and compliance standards (end-to-end encryption).\n- Collaborate with the QA team to utilize Dino Eval QA metrics for continuous model improvement.\n\n## Requirements\n- Strong experience with Python and modern AI/ML frameworks (PyTorch, TensorFlow).\n- Proven track record of working with Large Language Models (LLMs) and prompt engineering.\n- Experience with real-time systems, WebSocket handling, or Voice-over-IP (VoIP) technologies is a huge plus.\n- Familiarity with vector databases (Pinecone, Milvus) and semantic search.\n- Passion for &apos;Technological Innovation&apos; and &apos;Speed and Agility&apos;—shipping high-quality code in days, not weeks.</job_description>
     <candidate_name>K.Boopathi</candidate_name>
+    <candidate_resume>
+      <skills>MERN Stack, MongoDB, Express.js, React, Node.js, Python, Java, C, C++, Vector Databases, Meilisearch, Elasticsearch, Git, GitHub, Docker, Kubernetes, Azure, AWS, LLMs, LangChain, OpenAI API, Retrieval-Augmented Generation (RAG)</skills>
+      <experience>
+        <job>
+          <role>Full Stack Developer</role>
+          <company>Klenty</company>
+          <duration>March 2022 – Present</duration>
+          <description>Designed a workflow builder enabling LLMs to perform complex multi-step voice workflows. Built an automated code review agent. Developed a real-time AI voice agent using Pipecat. Designed and implemented custom domain tracking in Kubernetes.</description>
+        </job>
+        <job>
+          <role>Tech Blogger</role>
+          <company>Dev.to, Medium, Personal Blog</company>
+          <duration>2024 – Present</duration>
+          <description>Share insights on debugging, infrastructure challenges, and automation in tech. Created a Sherlock Holmes-inspired debugging series.</description>
+        </job>
+        <job>
+          <role>MERN Stack Developer</role>
+          <company>ChefAtHome FoodTech LLP</company>
+          <duration>March 2021 – September 2021</duration>
+          <description>Strengthened platform security by addressing vulnerabilities and refined database queries decreasing response times by 45%.</description>
+        </job>
+      </experience>
+      <education>
+        <school>
+          <degree>Computer Science Engineering</degree>
+          <institution>Einstein College of Engineering</institution>
+          <field>Computer Science</field>
+        </school>
+      </education>
+    </candidate_resume>
   </metadata>
   <company_context>
     **Summary:** Dinodial specializes in providing advanced AI-powered telephony solutions designed to elevate customer experience by automating customer calls with highly natural, low-latency conversational AI. Their platform, built on an &apos;AI Telephony stack,&apos; offers a complete AI Voice Suite and focuses on measurable outcomes, such as significantly lower Average Handle Time (AHT) and higher Net Promoter Scores (NPS), all while ensuring strict compliance and real-time monitoring. Dinodial enables businesses to deploy these capabilities rapidly, often seeing substantial results in days.

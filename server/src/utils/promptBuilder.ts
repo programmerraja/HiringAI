@@ -83,13 +83,39 @@ export function buildXMLPrompt(agent: IAgent, candidate: ICandidate, companyCont
     ? `\n  <company_context>\n    ${escapeXml(companyContext)}\n  </company_context>`
     : '';
 
+  let resumeXml = '';
+  if (candidate.resume) {
+    const skills = candidate.resume.skills.length > 0
+      ? `\n      <skills>${escapeXml(candidate.resume.skills.join(', '))}</skills>`
+      : '';
+
+    const experience = candidate.resume.experience.length > 0
+      ? `\n      <experience>\n${candidate.resume.experience.map(exp =>
+        `        <job>\n          <role>${escapeXml(exp.role)}</role>\n          <company>${escapeXml(exp.company)}</company>\n          <duration>${escapeXml(exp.duration)}</duration>\n          <description>${escapeXml(exp.description)}</description>\n        </job>`
+      ).join('\n')}\n      </experience>`
+      : '';
+
+    const education = candidate.resume.education.length > 0
+      ? `\n      <education>\n${candidate.resume.education.map(edu =>
+        `        <school>\n          <degree>${escapeXml(edu.degree)}</degree>\n          <institution>${escapeXml(edu.institution)}</institution>\n          <field>${escapeXml(edu.field)}</field>\n        </school>`
+      ).join('\n')}\n      </education>`
+      : '';
+
+    resumeXml = matches(skills || experience || education)
+      ? `\n    <candidate_resume>${skills}${experience}${education}\n    </candidate_resume>`
+      : '';
+
+    // Helper to check if any string is non-empty
+    function matches(str: string) { return str.length > 0; }
+  }
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <ai_master_prompt>
   <metadata>
     <agent_name>${escapeXml(agent.name)}</agent_name>
     <job_title>${escapeXml(agent.jobDetails.title)}</job_title>
     <job_description>${escapeXml(agent.jobDetails.description)}</job_description>
-    <candidate_name>${escapeXml(candidate.name)}</candidate_name>
+    <candidate_name>${escapeXml(candidate.name)}</candidate_name>${resumeXml}
   </metadata>${companyContextXml}
 
   <Persona>
