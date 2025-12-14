@@ -127,28 +127,28 @@ export const updateCompany = async (req: Request, res: Response, next: NextFunct
 export const rescrapeCompany = async (req: Request, res: Response, next: NextFunction) => {
   try {
     return Promise.reject("HACKTHON IS OVER SO NO MORE DEMO")
-    const company = await Company.findOne({
-      _id: req.params.id,
-      userId: req.user.id,
-    });
+    // const company = await Company.findOne({
+    //   _id: req.params.id,
+    //   userId: req.user.id,
+    // });
 
-    if (!company) {
-      const error: AppError = new Error('Company not found');
-      error.statusCode = 404;
-      return next(error);
-    }
+    // if (!company) {
+    //   const error: AppError = new Error('Company not found');
+    //   error.statusCode = 404;
+    //   return next(error);
+    // }
 
-    // Scrape website using Jina
-    const scraped = await scrapeWebsite(company.website);
-    const extracted = await extractCompanyContext(scraped.content);
+    // // Scrape website using Jina
+    // const scraped = await scrapeWebsite(company.website);
+    // const extracted = await extractCompanyContext(scraped.content);
 
-    company.context = extracted.context;
-    await company.save();
+    // company.context = extracted.context;
+    // await company.save();
 
-    res.status(200).json({
-      success: true,
-      data: company,
-    });
+    // res.status(200).json({
+    //   success: true,
+    //   data: company,
+    // });
   } catch (error) {
     next(error);
   }
