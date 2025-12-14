@@ -126,6 +126,7 @@ export const updateCompany = async (req: Request, res: Response, next: NextFunct
 // @access  Private
 export const rescrapeCompany = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    return Promise.reject("HACKTHON IS OVER SO NO MORE DEMO")
     const company = await Company.findOne({
       _id: req.params.id,
       userId: req.user.id,

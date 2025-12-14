@@ -198,6 +198,8 @@ export const deleteAgent = async (req: Request, res: Response, next: NextFunctio
 export const generateAgentQuestions = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { pillar, prompt } = req.body;
+    return Promise.reject("HACKTHON IS OVER SO NO MORE DEMO")
+
 
     // Validate pillar
     const validPillars: Pillar[] = ['experience', 'behavioral', 'role_specific', 'cultural_fit'];
